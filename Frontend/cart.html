@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart | The Yarn Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <div class="logo-wrap">
+      <div class="logo-text">🧶 TheYARN<em style="color:var(--brown);font-style:italic">Journey</em></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="home.html">Shop</a></li>
+      <li><a href="product.html">Products</a></li>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
+    </ul>
+    <div class="nav-icons">
+      <button class="nav-icon-btn" onclick="toggleSearch()" title="Search">🔍</button>
+      <button class="nav-icon-btn" onclick="toggleCart()" title="Cart">
+        🛒
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+      <button class="hamburger" onclick="toggleMobileNav()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileNav()"></div>
+<div class="mobile-nav" id="mobile-nav">
+  <button class="close-mobile" onclick="toggleMobileNav()">✕</button>
+  <ul>
+    <li><a href="index.html" onclick="toggleMobileNav()">Home</a></li>
+    <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
+    <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
+    <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
+    <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
+  </ul>
+</div>
+<section style="padding:80px 20px;min-height:60vh">
+  <div class="section-inner" style="max-width:700px">
+    <p class="section-label">Your Bag</p>
+    <h2 class="section-title">Your <em>Cart</em></h2>
+    <div id="cart-page-items" style="margin-top:30px"></div>
+    <div id="cart-page-empty" style="text-align:center;padding:60px 20px;display:none">
+      <div style="font-size:60px;margin-bottom:16px">🛒</div>
+      <p style="font-family:var(--font-display);font-size:22px;color:var(--brown-light);margin-bottom:20px">Your cart is empty</p>
+      <a href="home.html" class="btn-primary">Start Shopping →</a>
+    </div>
+    <div id="cart-page-footer" style="margin-top:30px;border-top:1px solid var(--blush-deep);padding-top:24px;display:none">
+      <div style="display:flex;justify-content:space-between;font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--dark);margin-bottom:20px">
+        <span>Total</span><span id="cart-page-total">₹0.00</span>
+      </div>
+      <button class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="showToast('🎉 Checkout coming soon!')">Proceed to Checkout →</button>
+      <a href="home.html" class="btn-outline" style="display:block;text-align:center;margin-top:12px;padding:13px">Continue Shopping</a>
+    </div>
+  </div>
+</section>
+<script>
+function renderCartPage() {
+  const cart = JSON.parse(localStorage.getItem("tyj_cart") || "[]");
+  const itemsEl = document.getElementById("cart-page-items");
+  const emptyEl = document.getElementById("cart-page-empty");
+  const footerEl = document.getElementById("cart-page-footer");
+  const totalEl = document.getElementById("cart-page-total");
+  if (!cart.length) { emptyEl.style.display="block"; footerEl.style.display="none"; return; }
+  emptyEl.style.display="none"; footerEl.style.display="block";
+  itemsEl.innerHTML = cart.map(item => `
+    <div class="cart-item" style="border-bottom:1px solid var(--blush-mid);padding:16px 0;display:flex;gap:14px;align-items:center">
+      <div style="width:70px;height:70px;background:var(--blush);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0">${item.icon}</div>
+      <div style="flex:1">
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--dark)">${item.name}</div>
+        <div style="font-size:14px;color:var(--brown);margin-top:4px">₹${item.sell}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+          <span style="font-size:13px;color:var(--brown-light)">Qty: ${item.qty}</span>
+        </div>
+      </div>
+      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--dark)">₹${item.sell * item.qty}</div>
+    </div>`).join("");
+  const total = cart.reduce((s,x) => s + x.sell*x.qty, 0);
+  totalEl.textContent = "₹" + total.toFixed(2);
+}
+renderCartPage();
+</script>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="fb-name">🧶 The Yarn Journey</div>
+      <p>Handcrafted crochet creations made with love, care, and a whole lot of yarn. Based in Guwahati, Assam, shipping happiness across India.</p>
+      <div class="social-links">
+        <a href="https://www.instagram.com/theyarnjourney" class="social-btn" target="_blank">📸</a>
+        <a href="https://www.facebook.com/share/18hX2TecDq/" class="social-btn" target="_blank">👍</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="home.html">Bouquets</a></li>
+        <li><a href="home.html">Mini Bouquets</a></li>
+        <li><a href="home.html">Keychains</a></li>
+        <li><a href="home.html">Home Decor</a></li>
+        <li><a href="product.html">Make Your Own</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="about.html#faq">FAQs</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a href="product.html">Custom Orders</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="contact.html">Shipping Policy</a></li>
+        <li><a href="contact.html">Return Policy</a></li>
+        <li><a href="contact.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 TheYarnJourney. All Rights Reserved. · Made with 🧶 & love in India</div>
+</footer>
+<!-- CART PANEL -->
+<div class="overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3>Your Cart 🛒</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-wrap"></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cart-total">₹0.00</span></div>
+    <button class="btn-primary" style="width:100%;padding:15px" onclick="window.location.href='cart.html'">Go to Cart →</button>
+  </div>
+</div>
+<!-- PRODUCT MODAL -->
+<div class="product-modal" id="product-modal">
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal-content" id="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-img" id="modal-img">💐</div>
+    <div class="modal-details" id="modal-details"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
