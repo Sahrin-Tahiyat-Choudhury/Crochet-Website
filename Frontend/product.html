@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Order | The Yarn Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <div class="logo-wrap">
+      <div class="logo-text">🧶 TheYARN<em style="color:var(--brown);font-style:italic">Journey</em></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="home.html">Shop</a></li>
+      <li><a href="product.html">Products</a></li>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
+    </ul>
+    <div class="nav-icons">
+      <button class="nav-icon-btn" onclick="toggleSearch()" title="Search">🔍</button>
+      <button class="nav-icon-btn" onclick="toggleCart()" title="Cart">
+        🛒
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+      <button class="hamburger" onclick="toggleMobileNav()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileNav()"></div>
+<div class="mobile-nav" id="mobile-nav">
+  <button class="close-mobile" onclick="toggleMobileNav()">✕</button>
+  <ul>
+    <li><a href="index.html" onclick="toggleMobileNav()">Home</a></li>
+    <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
+    <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
+    <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
+    <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
+  </ul>
+</div>
+<section id="myob" class="myob-bg" style="padding:80px 20px">
+  <div class="myob-inner">
+    <div class="myob-text">
+      <p class="section-label">Personalise It</p>
+      <h2 class="section-title">Make Your <em>Own</em><br>Bouquet</h2>
+      <p class="section-sub">Choose your size, pick your flowers, and we'll craft a one-of-a-kind bouquet just for you. Perfect for gifting or keeping!</p>
+      <div class="myob-steps">
+        <div class="myob-step"><div class="step-num">1</div><div class="step-text"><strong>Choose your bouquet size</strong><br>Mini, Small, Medium, or Large — pick what fits your budget.</div></div>
+        <div class="myob-step"><div class="step-num">2</div><div class="step-text"><strong>Select your flowers & colors</strong><br>Roses, tulips, sunflowers, lilies — in your favorite shades.</div></div>
+        <div class="myob-step"><div class="step-num">3</div><div class="step-text"><strong>Add personal touches</strong><br>Ribbon color, packaging style, and a personal note.</div></div>
+        <div class="myob-step"><div class="step-num">4</div><div class="step-text"><strong>We craft & ship!</strong><br>Allow 5–7 business days for your custom creation.</div></div>
+      </div>
+      <a href="#custom" class="btn-primary">Start Customising →</a>
+    </div>
+    <div class="myob-card-wrap">
+      <div class="bouquet-size-card" onclick="showToast('Mini Bouquet selected!')">
+        <div class="bs-icon">🌸</div><div class="bs-name">Mini</div><div class="bs-stems">3–5 stems</div><div class="bs-price">₹199</div>
+      </div>
+      <div class="bouquet-size-card" onclick="showToast('Small Bouquet selected!')">
+        <div class="bs-icon">💐</div><div class="bs-name">Small</div><div class="bs-stems">6–8 stems</div><div class="bs-price">₹349</div>
+      </div>
+      <div class="bouquet-size-card" onclick="showToast('Medium Bouquet selected!')">
+        <div class="bs-icon">🌺</div><div class="bs-name">Medium</div><div class="bs-stems">9–12 stems</div><div class="bs-price">₹559</div>
+      </div>
+      <div class="bouquet-size-card" onclick="showToast('Large Bouquet selected!')">
+        <div class="bs-icon">🪻</div><div class="bs-name">Large</div><div class="bs-stems">13–18 stems</div><div class="bs-price">₹899</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="custom" class="custom-order-bg">
+  <div class="custom-order-wrap">
+    <div class="custom-info">
+      <p class="section-label">Bespoke Creations</p>
+      <h2 class="section-title">Request a <em>Custom</em> Order</h2>
+      <p class="section-sub">Have something special in mind? Fill out the form and we'll get back to you within 24 hours!</p>
+      <div class="policy-tabs">
+        <button class="policy-tab-btn active" onclick="switchPolicy(this,'refund')">🔄 Return &amp; Refund</button>
+        <button class="policy-tab-btn" onclick="switchPolicy(this,'shipping')">📦 Shipping</button>
+        <button class="policy-tab-btn" onclick="switchPolicy(this,'privacy')">🔒 Privacy</button>
+      </div>
+      <div class="policy-panel active" id="policy-refund">
+        <div class="policy-section"><div class="policy-body">At TheYarnJourney, every product is handmade with care and made to order. We follow a strict return and refund policy.</div></div>
+        <div class="policy-section"><div class="policy-section-title"><span>1</span> No Returns or Exchanges</div><div class="policy-body">All orders are final once confirmed and processed.</div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>2</span> Eligible Refunds</div><div class="policy-body"><ul><li>Product damaged during transit</li><li>Incorrect or incomplete order received</li></ul></div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>3</span> Unboxing Video Required</div><div class="policy-body"><ul><li>Record a continuous uncut unboxing video</li><li>Share within 24 hours of delivery via WhatsApp or Instagram DM</li></ul></div><div class="policy-note">⚠️ The unboxing video is <strong>mandatory proof</strong>.</div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>4</span> Resolution</div><div class="policy-body"><ul><li>Replacement of the product, or</li><li>Store credit (depending on availability)</li></ul></div></div>
+      </div>
+      <div class="policy-panel" id="policy-shipping">
+        <div class="policy-section"><div class="policy-body">Every product is handmade. Please read our shipping policy before placing your order.</div></div>
+        <div class="policy-section"><div class="policy-section-title"><span>1</span> Processing Time</div><div class="policy-body"><ul><li>Making takes 3–14 days after payment confirmation</li><li>Need urgent delivery? Contact us on Instagram first</li></ul></div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>2</span> Delivery Timeline</div><div class="policy-body"><ul><li>Once dispatched: 5–13 days depending on location</li><li>You will receive Tracking ID and courier details</li></ul></div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>3</span> Address Changes</div><div class="policy-body"><ul><li>Changes allowed only within 24 hours of order</li><li>No changes after dispatch</li></ul></div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>4</span> Missing Packages</div><div class="policy-body"><ul><li>Contact us within 48 hours if marked delivered but not received</li></ul></div></div>
+      </div>
+      <div class="policy-panel" id="policy-privacy">
+        <div class="policy-section"><div class="policy-body">We respect your privacy and are committed to protecting your personal information.</div></div>
+        <div class="policy-section"><div class="policy-section-title"><span>1</span> Information We Collect</div><div class="policy-body"><ul><li>Name, phone, email, shipping address</li><li>Payment details (via secure third-party apps)</li></ul></div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>2</span> How We Use It</div><div class="policy-body">Only to process orders, communicate updates, and improve services. <strong>We never sell your data.</strong></div></div>
+        <div class="policy-divider"></div>
+        <div class="policy-section"><div class="policy-section-title"><span>3</span> Payments</div><div class="policy-body">Processed via GPay and PhonePe. We do not store payment details.</div></div>
+      </div>
+    </div>
+    <div class="custom-form">
+      <h3 style="font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--dark);margin-bottom:24px">Tell us what you need 🌸</h3>
+      <div class="form-row"><label class="form-label">Your Name</label><input type="text" class="form-input" placeholder="Your name"></div>
+      <div class="form-row"><label class="form-label">What would you like?</label>
+        <select class="form-select"><option value="">Select product type</option><option>Custom Bouquet</option><option>Mini Bouquet</option><option>Single Stem</option><option>Keychain</option><option>Home Decor</option><option>Desk Buddy</option><option>Gift Set</option><option>Something else...</option></select>
+      </div>
+      <div class="form-grid">
+        <div class="form-row"><label class="form-label">Preferred Colors</label><input type="text" class="form-input" placeholder="e.g. Pink, White, Peach"></div>
+        <div class="form-row"><label class="form-label">Budget (₹)</label><input type="text" class="form-input" placeholder="e.g. ₹500–800"></div>
+      </div>
+      <div class="form-row"><label class="form-label">Occasion / Purpose</label>
+        <select class="form-select"><option value="">Select occasion</option><option>Birthday Gift</option><option>Anniversary</option><option>Wedding</option><option>Baby Shower</option><option>Home Decoration</option><option>Just for myself</option><option>Other</option></select>
+      </div>
+      <div class="form-row"><label class="form-label">Additional Details / References</label>
+        <textarea class="form-textarea" placeholder="Describe your vision — size, flowers, colors, packaging preferences..."></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="showToast('✅ Request sent! We\'ll contact you soon.')">Send Custom Request 🌸</button>
+    </div>
+  </div>
+</section>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="fb-name">🧶 The Yarn Journey</div>
+      <p>Handcrafted crochet creations made with love, care, and a whole lot of yarn. Based in Guwahati, Assam, shipping happiness across India.</p>
+      <div class="social-links">
+        <a href="https://www.instagram.com/theyarnjourney" class="social-btn" target="_blank">📸</a>
+        <a href="https://www.facebook.com/share/18hX2TecDq/" class="social-btn" target="_blank">👍</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="home.html">Bouquets</a></li>
+        <li><a href="home.html">Mini Bouquets</a></li>
+        <li><a href="home.html">Keychains</a></li>
+        <li><a href="home.html">Home Decor</a></li>
+        <li><a href="product.html">Make Your Own</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="about.html#faq">FAQs</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a href="product.html">Custom Orders</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="contact.html">Shipping Policy</a></li>
+        <li><a href="contact.html">Return Policy</a></li>
+        <li><a href="contact.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 TheYarnJourney. All Rights Reserved. · Made with 🧶 & love in India</div>
+</footer>
+<!-- CART PANEL -->
+<div class="overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3>Your Cart 🛒</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-wrap"></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cart-total">₹0.00</span></div>
+    <button class="btn-primary" style="width:100%;padding:15px" onclick="window.location.href='cart.html'">Go to Cart →</button>
+  </div>
+</div>
+<!-- PRODUCT MODAL -->
+<div class="product-modal" id="product-modal">
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal-content" id="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-img" id="modal-img">💐</div>
+    <div class="modal-details" id="modal-details"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
