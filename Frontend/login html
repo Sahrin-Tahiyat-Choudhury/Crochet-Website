@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>The Yarn Journey – Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose:        #c47a7a;
+      --rose-dark:   #a85f5f;
+      --rose-light:  #f0dada;
+      --bg:          #faf3f3;
+      --card-bg:     #ffffff;
+      --text:        #3a2a2a;
+      --muted:       #8a6f6f;
+      --border:      #e8d4d4;
+      --fs-xs:   clamp(10px, 2.5vw, 12px);
+      --fs-sm:   clamp(12px, 3vw,  14px);
+      --fs-base: clamp(13px, 3.5vw, 15px);
+      --fs-md:   clamp(16px, 4vw,  20px);
+      --fs-lg:   clamp(20px, 5vw,  28px);
+      --fs-xl:   clamp(24px, 6vw,  32px);
+      --sp-xs:  clamp(6px,  1.5vw, 8px);
+      --sp-sm:  clamp(10px, 2.5vw, 14px);
+      --sp-md:  clamp(16px, 4vw,  24px);
+      --sp-lg:  clamp(24px, 5vw,  36px);
+      --sp-xl:  clamp(32px, 6vw,  48px);
+    }
+
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse at 60% 0%,   #f5e0e0 0%, transparent 60%),
+        radial-gradient(ellipse at 0%  100%,  #f5e8e8 0%, transparent 50%);
+      font-family: 'Jost', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--sp-md) clamp(12px, 4vw, 24px) clamp(40px, 8vw, 60px);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      width: 100%;
+      max-width: 520px;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: var(--sp-md);
+    }
+    nav a {
+      font-family: 'Jost', sans-serif;
+      font-size: var(--fs-sm);
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      padding: 6px 10px;
+    }
+    nav a:hover { color: var(--rose); }
+
+    /* LOGO */
+    .logo-wrap {
+      text-align: center;
+      margin-bottom: var(--sp-lg);
+      animation: fadeDown 0.6s ease both;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .logo-branch { font-size: clamp(16px, 4vw, 22px); color: var(--text); margin-bottom: 4px; }
+    .logo-box {
+      display: inline-block;
+      border: 1.5px solid var(--text);
+      padding: clamp(4px, 1.2vw, 6px) clamp(14px, 4vw, 24px) 2px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .logo-box::before, .logo-box::after {
+      content: '';
+      position: absolute;
+      left: -6px; right: -6px;
+      height: 1.5px;
+      background: var(--text);
+    }
+    .logo-box::before { top: -5px; }
+    .logo-box::after  { bottom: -5px; }
+    .logo-the {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(14px, 3.5vw, 18px);
+      font-style: italic;
+      color: var(--text);
+      display: block;
+      line-height: 1;
+    }
+    .logo-yarn {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-xl);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      display: block;
+      line-height: 1.1;
+    }
+    .logo-journey-wrap {
+      background: var(--rose-light);
+      display: inline-block;
+      padding: 2px clamp(10px, 3vw, 16px);
+      margin-top: 2px;
+    }
+    .logo-journey {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(14px, 4vw, 20px);
+      font-style: italic;
+      color: var(--text);
+    }
+    .logo-tagline {
+      font-size: var(--fs-xs);
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      margin-top: 8px;
+      text-transform: uppercase;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--card-bg);
+      border-radius: clamp(10px, 3vw, 16px);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 8px 40px rgba(180,120,120,0.12);
+      overflow: hidden;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    @media (min-width: 768px) { .card { max-width: 480px; } }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-body {
+      padding: clamp(24px, 6vw, 44px) clamp(20px, 6vw, 44px) clamp(20px, 4vw, 32px);
+    }
+
+    /* WELCOME */
+    .welcome { text-align: center; margin-bottom: clamp(20px, 5vw, 32px); }
+    .welcome h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-lg);
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .welcome p { font-size: var(--fs-sm); color: var(--muted); line-height: 1.6; }
+
+    /* FORM */
+    label {
+      display: block;
+      font-size: var(--fs-xs);
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: 0.03em;
+    }
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .forgot {
+      font-size: clamp(11px, 2.8vw, 13px);
+      color: var(--rose);
+      text-decoration: none;
+      font-style: italic;
+      padding: 4px 0;
+    }
+    .forgot:hover { text-decoration: underline; }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: clamp(11px, 2.8vw, 13px) clamp(12px, 3vw, 16px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Jost', sans-serif;
+      font-size: var(--fs-sm);
+      color: var(--text);
+      background: #fff;
+      margin-bottom: clamp(14px, 3.5vw, 20px);
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    input:focus { outline: none; border-color: var(--rose); }
+
+    .btn-primary {
+      width: 100%;
+      padding: clamp(13px, 3.2vw, 15px);
+      background: var(--rose);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Jost', sans-serif;
+      font-size: var(--fs-sm);
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 4px;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--rose-dark); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: clamp(20px, 5vw, 28px) 0 clamp(16px, 4vw, 24px);
+    }
+
+    .new-user { text-align: center; margin-bottom: clamp(12px, 3vw, 16px); }
+    .new-user h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-md);
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .new-user p { font-size: var(--fs-sm); color: var(--muted); }
+
+    .btn-secondary {
+      display: block;
+      width: fit-content;
+      max-width: 220px;
+      margin: 0 auto;
+      padding: clamp(10px, 2.5vw, 12px) clamp(24px, 5vw, 36px);
+      border: 1.5px solid var(--rose);
+      border-radius: 8px;
+      font-family: 'Jost', sans-serif;
+      font-size: var(--fs-xs);
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: var(--rose);
+      text-decoration: none;
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+    }
+    .btn-secondary:hover { background: var(--rose); color: #fff; }
+
+    /* CARD FOOTER SVG */
+    .card-footer { height: clamp(100px, 22vw, 160px); position: relative; overflow: hidden; }
+    .deco { width: 100%; height: 100%; display: block; }
+
+    /* DOTS */
+    .dots { display: flex; gap: 6px; justify-content: center; margin-top: clamp(14px, 3.5vw, 20px); }
+    .dot { width: clamp(6px, 1.5vw, 7px); height: clamp(6px, 1.5vw, 7px); border-radius: 50%; background: var(--rose-light); }
+    .dot.active { background: var(--rose); }
+
+    #panel-create { display: none; }
+
+    @media (min-width: 1024px) {
+      body { justify-content: center; min-height: 100vh; padding-top: 40px; padding-bottom: 60px; }
+      .card { box-shadow: 0 16px 60px rgba(180,120,120,0.16); }
+    }
+    @media (max-width: 360px) {
+      .logo-box::before, .logo-box::after { left: -3px; right: -3px; }
+      .btn-secondary { max-width: 100%; }
+      .field-row { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-height: 500px) and (orientation: landscape) {
+      .logo-wrap { margin-bottom: 12px; }
+      .logo-branch { display: none; }
+      .card-footer { height: 80px; }
+      .welcome { margin-bottom: 14px; }
+      body { padding-top: 12px; }
+    }
+    @media (min-width: 600px) { .card-body { padding: 40px 48px 28px; } }
+  </style>
+</head>
+<body>
+
+  <nav><a href="home.html">Home</a></nav>
+
+  <!-- LOGO -->
+  <div class="logo-wrap">
+    <div class="logo-branch">🌿</div>
+    <div class="logo-box">
+      <span class="logo-the">The</span>
+      <span class="logo-yarn">YARN</span>
+      <div class="logo-journey-wrap">
+        <span class="logo-journey">Journey</span>
+      </div>
+    </div>
+    <div class="logo-tagline">Since · 2023 With You</div>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+    <div class="card-body">
+
+      <!-- SIGN IN PANEL -->
+      <div id="panel-signin">
+        <div class="welcome">
+          <h1>Welcome Back!</h1>
+          <p>Sign in to access your crochet account.</p>
+        </div>
+        <form onsubmit="handleSignIn(event);">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="Email Address" autocomplete="email" required />
+          <div class="field-row">
+            <label for="password" style="margin-bottom:0;">Password</label>
+            <a href="#" class="forgot">Forgot password?</a>
+          </div>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required />
+          <button type="submit" class="btn-primary">Sign In</button>
+        </form>
+        <hr class="divider" />
+        <div class="new-user">
+          <h3>New to The YARN Journey?</h3>
+          <p>Create an account to join our crochet community!</p>
+        </div>
+        <a href="#" class="btn-secondary" onclick="showPanel('create'); return false;">Create Account</a>
+      </div>
+
+      <!-- CREATE ACCOUNT PANEL -->
+      <div id="panel-create">
+        <div class="welcome">
+          <h1>Join Us!</h1>
+          <p>Create your free crochet community account.</p>
+        </div>
+        <form onsubmit="handleCreate(event);">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Full Name" autocomplete="name" required />
+          <label for="new-email">Email Address</label>
+          <input type="email" id="new-email" placeholder="Email Address" autocomplete="email" required />
+          <label for="new-password">Password</label>
+          <input type="password" id="new-password" placeholder="Create a password" autocomplete="new-password" required />
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+        <hr class="divider" />
+        <div class="new-user"><p>Already have an account?</p></div>
+        <a href="#" class="btn-secondary" onclick="showPanel('signin'); return false;">Sign In</a>
+      </div>
+
+    </div>
+
+    <!-- DECORATIVE FOOTER -->
+    <div class="card-footer">
+      <svg class="deco" viewBox="0 0 480 160" preserveAspectRatio="xMidYMax slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 20 Q12 8 24 20 Q36 32 48 20 Q60 8 72 20 Q84 32 96 20 Q108 8 120 20 Q132 32 144 20 Q156 8 168 20 Q180 32 192 20 Q204 8 216 20 Q228 32 240 20 Q252 8 264 20 Q276 32 288 20 Q300 8 312 20 Q324 32 336 20 Q348 8 360 20 Q372 32 384 20 Q396 8 408 20 Q420 32 432 20 Q444 8 456 20 Q468 32 480 20 L480 160 L0 160 Z" fill="white" opacity="0.5"/>
+        <circle cx="90" cy="115" r="38" fill="#e8b4b4" opacity="0.85"/>
+        <circle cx="90" cy="115" r="28" fill="#d99090" opacity="0.5"/>
+        <ellipse cx="90" cy="115" rx="38" ry="38" stroke="#c47a7a" stroke-width="1" fill="none" opacity="0.3"/>
+        <path d="M58 100 Q75 85 90 100 Q105 115 120 100" stroke="#c47a7a" stroke-width="1.5" fill="none" opacity="0.7"/>
+        <path d="M60 115 Q75 100 90 115 Q105 130 120 115" stroke="#c47a7a" stroke-width="1.5" fill="none" opacity="0.7"/>
+        <path d="M62 128 Q78 113 92 128 Q106 143 122 128" stroke="#c47a7a" stroke-width="1.2" fill="none" opacity="0.5"/>
+        <path d="M122 102 Q135 90 142 100 Q148 108 138 118" stroke="#c47a7a" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <line x1="130" y1="145" x2="200" y2="95" stroke="#b8956a" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="200" cy="93" r="5" fill="#b8956a"/>
+        <path d="M197 88 Q205 80 210 88" stroke="#b8956a" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="175" cy="130" r="28" fill="#f0e8d8" opacity="0.9"/>
+        <circle cx="175" cy="130" r="20" fill="#e8dac8" opacity="0.5"/>
+        <path d="M150 122 Q163 110 175 122 Q187 134 200 122" stroke="#c4a882" stroke-width="1.2" fill="none" opacity="0.7"/>
+        <path d="M152 133 Q165 121 177 133 Q189 145 202 133" stroke="#c4a882" stroke-width="1.2" fill="none" opacity="0.6"/>
+        <g transform="translate(210, 110) rotate(-30)">
+          <ellipse cx="0" cy="-8" rx="5" ry="8" stroke="#b8956a" stroke-width="1.5" fill="none"/>
+          <ellipse cx="8" cy="-8" rx="5" ry="8" stroke="#b8956a" stroke-width="1.5" fill="none"/>
+          <line x1="4" y1="0" x2="30" y2="28" stroke="#c8a878" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="8" y1="0" x2="34" y2="28" stroke="#c8a878" stroke-width="2.5" stroke-linecap="round"/>
+        </g>
+        <g transform="translate(170, 95)">
+          <circle cx="0" cy="0" r="5" fill="#e8c8c8"/>
+          <ellipse cx="0" cy="-10" rx="5" ry="7" fill="white" opacity="0.9"/>
+          <ellipse cx="0" cy="10" rx="5" ry="7" fill="white" opacity="0.9"/>
+          <ellipse cx="-10" cy="0" rx="7" ry="5" fill="white" opacity="0.9"/>
+          <ellipse cx="10" cy="0" rx="7" ry="5" fill="white" opacity="0.9"/>
+          <ellipse cx="-7" cy="-7" rx="5" ry="7" fill="white" opacity="0.8" transform="rotate(45 -7 -7)"/>
+          <ellipse cx="7" cy="-7" rx="5" ry="7" fill="white" opacity="0.8" transform="rotate(-45 7 -7)"/>
+          <ellipse cx="-7" cy="7" rx="5" ry="7" fill="white" opacity="0.8" transform="rotate(-45 -7 7)"/>
+          <ellipse cx="7" cy="7" rx="5" ry="7" fill="white" opacity="0.8" transform="rotate(45 7 7)"/>
+        </g>
+        <g transform="translate(390, 100)">
+          <circle cx="0" cy="0" r="6" fill="#c47a7a"/>
+          <ellipse cx="0" cy="-12" rx="6" ry="8" fill="#e8a0a0" opacity="0.9"/>
+          <ellipse cx="0" cy="12" rx="6" ry="8" fill="#e8a0a0" opacity="0.9"/>
+          <ellipse cx="-12" cy="0" rx="8" ry="6" fill="#e8a0a0" opacity="0.9"/>
+          <ellipse cx="12" cy="0" rx="8" ry="6" fill="#e8a0a0" opacity="0.9"/>
+          <ellipse cx="-8" cy="-8" rx="6" ry="8" fill="#e8a0a0" opacity="0.8" transform="rotate(45 -8 -8)"/>
+          <ellipse cx="8" cy="-8" rx="6" ry="8" fill="#e8a0a0" opacity="0.8" transform="rotate(-45 8 -8)"/>
+          <ellipse cx="-8" cy="8" rx="6" ry="8" fill="#e8a0a0" opacity="0.8" transform="rotate(-45 -8 8)"/>
+          <ellipse cx="8" cy="8" rx="6" ry="8" fill="#e8a0a0" opacity="0.8" transform="rotate(45 8 8)"/>
+        </g>
+        <g transform="translate(430, 125)">
+          <circle cx="0" cy="0" r="4" fill="#e8d8c8"/>
+          <ellipse cx="0" cy="-8" rx="4" ry="6" fill="#f5ede0" opacity="0.9"/>
+          <ellipse cx="0" cy="8" rx="4" ry="6" fill="#f5ede0" opacity="0.9"/>
+          <ellipse cx="-8" cy="0" rx="6" ry="4" fill="#f5ede0" opacity="0.9"/>
+          <ellipse cx="8" cy="0" rx="6" ry="4" fill="#f5ede0" opacity="0.9"/>
+          <ellipse cx="-6" cy="-6" rx="4" ry="6" fill="#f5ede0" opacity="0.8" transform="rotate(45 -6 -6)"/>
+          <ellipse cx="6" cy="-6" rx="4" ry="6" fill="#f5ede0" opacity="0.8" transform="rotate(-45 6 -6)"/>
+        </g>
+        <path d="M360 130 Q370 110 385 120" stroke="#b8c8a8" stroke-width="1.5" fill="none"/>
+        <path d="M368 125 Q375 108 388 115" stroke="#b8c8a8" stroke-width="1.2" fill="none"/>
+        <path d="M0 140 Q20 132 40 140 Q60 148 80 140 Q100 132 120 140 Q140 148 160 140 Q180 132 200 140 Q220 148 240 140 Q260 132 280 140 Q300 148 320 140 Q340 132 360 140 Q380 148 400 140 Q420 132 440 140 Q460 148 480 140" stroke="white" stroke-width="1.5" fill="none" opacity="0.8"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- DOTS -->
+  <div class="dots">
+    <div class="dot active"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <script>
+    function showPanel(name) {
+      document.getElementById('panel-signin').style.display = name === 'signin' ? 'block' : 'none';
+      document.getElementById('panel-create').style.display = name === 'create' ? 'block' : 'none';
+    }
+    function handleSignIn(e) {
+      e.preventDefault();
+      window.location.href = 'home.html';
+    }
+    function handleCreate(e) {
+      e.preventDefault();
+      window.location.href = 'home.html';
+    }
+  </script>
+</body>
+</html>
