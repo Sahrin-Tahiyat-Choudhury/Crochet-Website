@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us | The Yarn Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <div class="logo-wrap">
+      <div class="logo-text">🧶 TheYARN<em style="color:var(--brown);font-style:italic">Journey</em></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="home.html">Shop</a></li>
+      <li><a href="product.html">Products</a></li>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
+    </ul>
+    <div class="nav-icons">
+      <button class="nav-icon-btn" onclick="toggleSearch()" title="Search">🔍</button>
+      <button class="nav-icon-btn" onclick="toggleCart()" title="Cart">
+        🛒
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+      <button class="hamburger" onclick="toggleMobileNav()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileNav()"></div>
+<div class="mobile-nav" id="mobile-nav">
+  <button class="close-mobile" onclick="toggleMobileNav()">✕</button>
+  <ul>
+    <li><a href="index.html" onclick="toggleMobileNav()">Home</a></li>
+    <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
+    <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
+    <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
+    <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
+  </ul>
+</div>
+<section id="contact" class="contact-bg">
+  <div class="contact-inner">
+    <div>
+      <p class="section-label">Get In Touch</p>
+      <h2 class="section-title">We'd Love to <em>Hear</em><br>From You</h2>
+      <p class="section-sub">Whether you have a question, want to place a custom order, or just want to say hi — we're always happy to chat!</p>
+      <div class="contact-links">
+        <a href="https://www.instagram.com/theyarnjourney" class="contact-link" target="_blank">
+          <span class="cl-icon">📸</span><div class="cl-text"><strong>Instagram DM</strong><span>@theyarnjourney — Quickest response!</span></div>
+        </a>
+        <a href="mailto:theyarnjourney.shop@gmail.com" class="contact-link">
+          <span class="cl-icon">✉️</span><div class="cl-text"><strong>Email Us</strong><span>theyarnjourney.shop@gmail.com</span></div>
+        </a>
+        <a href="https://www.facebook.com/share/18hX2TecDq/" class="contact-link" target="_blank">
+          <span class="cl-icon">👍</span><div class="cl-text"><strong>Facebook</strong><span>theyarnjourney</span></div>
+        </a>
+        <div class="contact-link" style="cursor:default">
+          <span class="cl-icon">📍</span><div class="cl-text"><strong>Location</strong><span>Guwahati, Assam, India</span></div>
+        </div>
+      </div>
+      <p style="margin-top:18px;font-size:13px;color:var(--brown-light);line-height:1.6;">For custom orders, please contact via <strong style="color:var(--brown)">Instagram DM</strong>.</p>
+    </div>
+    <div class="contact-form-wrap">
+      <h3 style="font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--dark);margin-bottom:22px">Send a Message</h3>
+      <div class="form-row"><label class="form-label">Your Name</label><input type="text" class="form-input" placeholder="Your name"></div>
+      <div class="form-row"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="your@email.com"></div>
+      <div class="form-row"><label class="form-label">Subject</label><input type="text" class="form-input" placeholder="What's it about?"></div>
+      <div class="form-row"><label class="form-label">Message</label><textarea class="form-textarea" placeholder="Your message..."></textarea></div>
+      <button class="btn-primary" style="width:100%;padding:14px" onclick="showToast('✅ Message sent! We\'ll reply soon.')">Send Message →</button>
+    </div>
+  </div>
+</section>
+
+<section class="policies-bg" style="padding:70px 20px">
+  <div class="section-inner" style="text-align:center;margin-bottom:40px">
+    <p class="section-label" style="color:rgba(255,248,243,0.5)">Our Commitments</p>
+    <h2 class="section-title" style="color:var(--white)">Shop With <em style="color:var(--peach-soft)">Confidence</em></h2>
+  </div>
+  <div class="policies-grid">
+    <div class="policy-card"><span class="policy-icon">🚚</span><h3>Free Shipping</h3><p>On all orders above ₹999. Nationwide delivery across India.</p></div>
+    <div class="policy-card"><span class="policy-icon">🤝</span><h3>100% Handmade</h3><p>Every item is lovingly crafted by hand. No machines, no mass production.</p></div>
+    <div class="policy-card"><span class="policy-icon">🔄</span><h3>Easy Returns</h3><p>Damaged on arrival? Contact us within 24hrs for a replacement or refund.</p></div>
+    <div class="policy-card"><span class="policy-icon">🔒</span><h3>Secure Payments</h3><p>Pay via UPI, Paytm, Google Pay, or bank transfer — safe and instant.</p></div>
+    <div class="policy-card"><span class="policy-icon">✅</span><h3>Quality Checked</h3><p>Every piece is inspected before dispatch. Photos shared for custom orders.</p></div>
+    <div class="policy-card"><span class="policy-icon">💬</span><h3>24hr Support</h3><p>We respond to all Instagram DM and email inquiries within 24 hours.</p></div>
+  </div>
+</section>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="fb-name">🧶 The Yarn Journey</div>
+      <p>Handcrafted crochet creations made with love, care, and a whole lot of yarn. Based in Guwahati, Assam, shipping happiness across India.</p>
+      <div class="social-links">
+        <a href="https://www.instagram.com/theyarnjourney" class="social-btn" target="_blank">📸</a>
+        <a href="https://www.facebook.com/share/18hX2TecDq/" class="social-btn" target="_blank">👍</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="home.html">Bouquets</a></li>
+        <li><a href="home.html">Mini Bouquets</a></li>
+        <li><a href="home.html">Keychains</a></li>
+        <li><a href="home.html">Home Decor</a></li>
+        <li><a href="product.html">Make Your Own</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="about.html#faq">FAQs</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a href="product.html">Custom Orders</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="contact.html">Shipping Policy</a></li>
+        <li><a href="contact.html">Return Policy</a></li>
+        <li><a href="contact.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 TheYarnJourney. All Rights Reserved. · Made with 🧶 & love in India</div>
+</footer>
+<!-- CART PANEL -->
+<div class="overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3>Your Cart 🛒</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-wrap"></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cart-total">₹0.00</span></div>
+    <button class="btn-primary" style="width:100%;padding:15px" onclick="window.location.href='cart.html'">Go to Cart →</button>
+  </div>
+</div>
+<!-- PRODUCT MODAL -->
+<div class="product-modal" id="product-modal">
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal-content" id="modal-content">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-img" id="modal-img">💐</div>
+    <div class="modal-details" id="modal-details"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
