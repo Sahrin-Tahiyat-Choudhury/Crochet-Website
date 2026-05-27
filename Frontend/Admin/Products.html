@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products — The Yarn Journey Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Product Management</h1>
+        <p>Manage your crochet flower collection · 30 products</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-outline" onclick="showToast('CSV export started…','info')">⬇️ Import</button>
+        <button class="btn btn-primary" onclick="openModal('addProductModal')">＋ Add Product</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-icon">🧶</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-value">30</div>
+          <div class="stat-sub">↑ 3 this month</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <div class="stat-label">Active Listings</div>
+          <div class="stat-value">24</div>
+          <div class="stat-sub">↑ 2 this week</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-info">
+          <div class="stat-label">Low Stock Items</div>
+          <div class="stat-value">3</div>
+          <div class="stat-sub warn">↑ 1 alert new</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✂️</div>
+        <div class="stat-info">
+          <div class="stat-label">Active Discounts</div>
+          <div class="stat-value">5</div>
+          <div class="stat-sub neutral">Running now</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Products</span>
+        <button class="btn btn-outline btn-sm" onclick="showToast('Exporting CSV…','info')">Export CSV</button>
+      </div>
+
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="filters-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search products, SKU, description…" oninput="filterProducts(this.value)" />
+          </div>
+          <select class="filter-select" onchange="filterProducts()">
+            <option>All Categories</option>
+            <option>Flower Bouquets</option>
+            <option>Single Flowers</option>
+            <option>Wreaths</option>
+            <option>Gift Sets</option>
+            <option>Accessories</option>
+          </select>
+          <select class="filter-select" onchange="filterProducts()">
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Draft</option>
+            <option>Low Stock</option>
+            <option>Out of Stock</option>
+          </select>
+          <select class="filter-select" style="min-width:120px;">
+            <option>Sort: Newest</option>
+            <option>Sort: Oldest</option>
+            <option>Price: Low→High</option>
+            <option>Price: High→Low</option>
+            <option>Name A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="productsTable">
+          <thead>
+            <tr>
+              <th>PRODUCT</th>
+              <th>CATEGORY</th>
+              <th>PRICE</th>
+              <th>COLORS</th>
+              <th>STOCK</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="productsTbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <span id="paginationInfo">Showing 1–10 of 30 products</span>
+        <div class="pagination-pages">
+          <button class="page-btn" disabled>‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn" onclick="goPage(2)">2</button>
+          <button class="page-btn" onclick="goPage(3)">3</button>
+          <button class="page-btn" onclick="goPage(2)">›</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add New Product</span>
+      <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-section-title">BASIC INFO</div>
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input class="form-input" placeholder="e.g. Handmade Crochet Market Bag" />
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select">
+            <option>Flower Bouquets</option>
+            <option>Single Flowers</option>
+            <option>Wreaths</option>
+            <option>Gift Sets</option>
+            <option>Accessories</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SKU / Product Code</label>
+          <input class="form-input" placeholder="TYJ-001" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Product Description</label>
+        <textarea class="form-textarea" placeholder="Describe materials, size, care instructions, customization options…"></textarea>
+      </div>
+
+      <div class="form-section-title">PRICING & DISCOUNTS</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Regular Price (₹)</label>
+          <input class="form-input" type="number" placeholder="0.00" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sale Price (₹)</label>
+          <input class="form-input" type="number" placeholder="0.00" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Discount Type</label>
+          <select class="form-select">
+            <option>None</option>
+            <option>Percentage</option>
+            <option>Fixed Amount</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Discount Value</label>
+          <input class="form-input" placeholder="e.g. 20 for 20%" />
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span style="font-size:13px;font-weight:500;">Mark as On Sale</span>
+        <button class="toggle" id="saleToggle"></button>
+      </div>
+
+      <div class="form-section-title" style="margin-top:18px;">INVENTORY & STOCK</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Stock Quantity</label>
+          <input class="form-input" type="number" placeholder="e.g. 15" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Low Stock Alert At</label>
+          <input class="form-input" type="number" placeholder="e.g. 3" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addProductModal')">Cancel</button>
+      <button class="btn btn-outline" onclick="showToast('Saved as draft','info');closeModal('addProductModal')">Save as Draft</button>
+      <button class="btn btn-primary" onclick="showToast('Product published! 🌸','success');closeModal('addProductModal')">✔ Publish Product</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script src="products.js"></script>
+</body>
+</html>
