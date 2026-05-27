@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customers — The Yarn Journey Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Customers</h1>
+        <p>View and manage your customer base</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-outline" onclick="showToast('Exporting customer data…','info')">📤 Export</button>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Customers</div>
+          <div class="stat-value">86</div>
+          <div class="stat-sub">↑ 5 this month</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🔁</div>
+        <div class="stat-info">
+          <div class="stat-label">Repeat Buyers</div>
+          <div class="stat-value">34</div>
+          <div class="stat-sub">39.5% retention</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-info">
+          <div class="stat-label">Top Spender</div>
+          <div class="stat-value">₹8.4k</div>
+          <div class="stat-sub neutral">Priya Sharma</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📍</div>
+        <div class="stat-info">
+          <div class="stat-label">Cities Reached</div>
+          <div class="stat-value">12</div>
+          <div class="stat-sub info">Across India</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Customer Directory</span>
+      </div>
+      <div class="card-body" style="padding-bottom:0;">
+        <div class="filters-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search by name, phone, city…" oninput="searchCustomers(this.value)" />
+          </div>
+          <select class="filter-select">
+            <option>All Cities</option>
+            <option>Mumbai</option>
+            <option>Delhi</option>
+            <option>Bangalore</option>
+            <option>Chennai</option>
+            <option>Hyderabad</option>
+          </select>
+          <select class="filter-select">
+            <option>All Customers</option>
+            <option>Repeat Buyers</option>
+            <option>New Customers</option>
+            <option>High Spenders</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>CUSTOMER</th>
+              <th>CONTACT</th>
+              <th>CITY</th>
+              <th>ORDERS</th>
+              <th>TOTAL SPENT</th>
+              <th>LAST ORDER</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="customersTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span>Showing 1–10 of 86 customers</span>
+        <div class="pagination-pages">
+          <button class="page-btn" disabled>‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Customer Detail Modal -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="customerModalTitle">Customer Profile</span>
+      <button class="modal-close" onclick="closeModal('customerModal')">✕</button>
+    </div>
+    <div class="modal-body" id="customerModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('customerModal')">Close</button>
+      <button class="btn btn-primary" onclick="showToast('Message sent 💌','success');closeModal('customerModal')">💌 Send Message</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script src="customers.js"></script>
+</body>
+</html>
