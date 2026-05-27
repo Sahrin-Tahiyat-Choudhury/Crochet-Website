@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Categories — The Yarn Journey Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Categories</h1>
+        <p>Organise your product catalogue</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary" onclick="openModal('addCatModal')">＋ Add Category</button>
+      </div>
+    </div>
+
+    <!-- Category Grid -->
+    <div id="catGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;"></div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">All Categories</span></div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>CATEGORY</th>
+              <th>PRODUCTS</th>
+              <th>ACTIVE</th>
+              <th>REVENUE</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="catTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal-overlay" id="addCatModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Category</span>
+      <button class="modal-close" onclick="closeModal('addCatModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Category Name</label>
+        <input class="form-input" placeholder="e.g. Flower Bouquets" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon / Emoji</label>
+        <input class="form-input" placeholder="e.g. 🌸" maxlength="4" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" placeholder="Brief description of this category…"></textarea>
+      </div>
+      <div class="toggle-row">
+        <span style="font-size:13px;font-weight:500;">Visible on Store</span>
+        <button class="toggle on"></button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addCatModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="showToast('Category created! 🏷️','success');closeModal('addCatModal')">Save Category</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+const CATS = [
+  { name:'Flower Bouquets', icon:'💐', products:12, active:10, revenue:19840 },
+  { name:'Single Flowers',  icon:'🌸', products:6,  active:6,  revenue:6230 },
+  { name:'Wreaths',         icon:'🌿', products:5,  active:4,  revenue:8740 },
+  { name:'Gift Sets',       icon:'🎁', products:4,  active:3,  revenue:9610 },
+  { name:'Accessories',     icon:'✂️', products:3,  active:3,  revenue:2190 },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebar('categories');
+  initToggles();
+
+  // Category cards
+  const grid = document.getElementById('catGrid');
+  grid.innerHTML = CATS.map(c => `
+    <div class="card" style="padding:20px;display:flex;align-items:center;gap:14px;cursor:pointer;"
+         onclick="showToast('Viewing ${c.name}','info')">
+      <div style="font-size:32px;">${c.icon}</div>
+      <div>
+        <div style="font-weight:600;font-size:14px;">${c.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${c.products} products · ${c.active} active</div>
+        <div style="font-size:12px;color:var(--green);margin-top:2px;">₹${c.revenue.toLocaleString('en-IN')} revenue</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Table
+  const tbody = document.getElementById('catTbody');
+  tbody.innerHTML = CATS.map(c => `
+    <tr>
+      <td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">${c.icon}</span><span style="font-weight:500;">${c.name}</span></div></td>
+      <td><strong>${c.products}</strong></td>
+      <td><strong>${c.active}</strong></td>
+      <td><strong>₹${c.revenue.toLocaleString('en-IN')}</strong></td>
+      <td>
+        <div class="action-btns">
+          <button class="icon-btn" onclick="showToast('Editing category','info')">✏️</button>
+          <button class="icon-btn danger" onclick="showToast('Category deleted','error')">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+});
+</script>
+</body>
+</html>
