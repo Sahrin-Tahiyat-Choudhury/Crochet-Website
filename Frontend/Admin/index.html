@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — The Yarn Journey Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .dashboard-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .quick-link-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+    .quick-link {
+      background:#fff; border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px 16px; text-align:center; cursor:pointer; transition:all .18s;
+      box-shadow:var(--shadow); text-decoration:none; color:inherit; display:block;
+    }
+    .quick-link:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:var(--shadow-md); }
+    .quick-link .ql-icon { font-size:28px; margin-bottom:8px; }
+    .quick-link .ql-label { font-size:13px; font-weight:600; color:var(--text-dark); }
+    .quick-link .ql-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .activity-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border-light); }
+    .activity-item:last-child { border-bottom:none; }
+    .activity-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:5px; flex-shrink:0; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Welcome back, Shop Owner 🌸</h1>
+        <p>Here's what's happening with The Yarn Journey today</p>
+      </div>
+      <div class="page-header-actions">
+        <span style="font-size:13px;color:var(--text-muted);">Wednesday, 27 May 2026</span>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info"><div class="stat-label">Revenue Today</div><div class="stat-value">₹2,397</div><div class="stat-sub">↑ 3 orders placed</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info"><div class="stat-label">Pending Orders</div><div class="stat-value">7</div><div class="stat-sub warn">Needs attention</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🧶</div>
+        <div class="stat-info"><div class="stat-label">Total Products</div><div class="stat-value">30</div><div class="stat-sub">↑ 3 this month</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info"><div class="stat-label">Total Customers</div><div class="stat-value">86</div><div class="stat-sub">↑ 5 this month</div></div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="quick-link-grid">
+      <a href="products.html"   class="quick-link"><div class="ql-icon">🌸</div><div class="ql-label">Products</div><div class="ql-sub">30 total</div></a>
+      <a href="orders.html"     class="quick-link"><div class="ql-icon">📦</div><div class="ql-label">Orders</div><div class="ql-sub">7 pending</div></a>
+      <a href="inventory.html"  class="quick-link"><div class="ql-icon">📊</div><div class="ql-label">Inventory</div><div class="ql-sub">3 low stock</div></a>
+      <a href="analytics.html"  class="quick-link"><div class="ql-icon">📈</div><div class="ql-label">Analytics</div><div class="ql-sub">View report</div></a>
+      <a href="customers.html"  class="quick-link"><div class="ql-icon">👥</div><div class="ql-label">Customers</div><div class="ql-sub">86 total</div></a>
+      <a href="discounts.html"  class="quick-link"><div class="ql-icon">✂️</div><div class="ql-label">Discounts</div><div class="ql-sub">5 active</div></a>
+      <a href="categories.html" class="quick-link"><div class="ql-icon">🏷️</div><div class="ql-label">Categories</div><div class="ql-sub">5 categories</div></a>
+      <a href="settings.html"   class="quick-link"><div class="ql-icon">⚙️</div><div class="ql-label">Settings</div><div class="ql-sub">Configure store</div></a>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Recent Orders -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Orders</span>
+          <a href="orders.html" class="btn btn-ghost btn-sm">View all →</a>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead><tr><th>ORDER</th><th>CUSTOMER</th><th>TOTAL</th><th>STATUS</th></tr></thead>
+            <tbody>
+              <tr><td><span style="color:var(--accent);font-weight:600;">TYJ-0148</span></td><td>Priya Sharma</td><td>₹1,698</td><td><span class="badge badge-green">Delivered</span></td></tr>
+              <tr><td><span style="color:var(--accent);font-weight:600;">TYJ-0147</span></td><td>Ananya Reddy</td><td>₹699</td><td><span class="badge badge-blue">Shipped</span></td></tr>
+              <tr><td><span style="color:var(--accent);font-weight:600;">TYJ-0146</span></td><td>Meera Iyer</td><td>₹1,499</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+              <tr><td><span style="color:var(--accent);font-weight:600;">TYJ-0145</span></td><td>Kavitha Nair</td><td>₹1,199</td><td><span class="badge badge-blue">Shipped</span></td></tr>
+              <tr><td><span style="color:var(--accent);font-weight:600;">TYJ-0144</span></td><td>Ritika Verma</td><td>₹1,196</td><td><span class="badge badge-green">Delivered</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Activity</span></div>
+        <div class="card-body">
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--green);"></div>
+            <div><div style="font-size:13px;font-weight:500;">New order #TYJ-0148 placed</div><div style="font-size:11.5px;color:var(--text-muted);">Priya Sharma · Sunflower Bouquet × 2 · 12 min ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--blue);"></div>
+            <div><div style="font-size:13px;font-weight:500;">Order #TYJ-0147 shipped</div><div style="font-size:11.5px;color:var(--text-muted);">Ananya Reddy · Rose Bunch · 1 hr ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--yellow);"></div>
+            <div><div style="font-size:13px;font-weight:500;">Low stock alert: Daisy Gift Set</div><div style="font-size:11.5px;color:var(--text-muted);">Only 3 units remaining · 2 hrs ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot"></div>
+            <div><div style="font-size:13px;font-weight:500;">New customer registered</div><div style="font-size:11.5px;color:var(--text-muted);">Deepa Thomas · Mumbai · 4 hrs ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--accent);"></div>
+            <div><div style="font-size:13px;font-weight:500;">Promo code WELCOME10 used</div><div style="font-size:11.5px;color:var(--text-muted);">Sanya Khanna saved ₹70 · 5 hrs ago</div></div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--green);"></div>
+            <div><div style="font-size:13px;font-weight:500;">Product published: Marigold Bunch</div><div style="font-size:11.5px;color:var(--text-muted);">SKU TYJ-011 · ₹449 · Yesterday</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Products -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Best Selling Products</span><a href="analytics.html" class="btn btn-ghost btn-sm">Analytics →</a></div>
+        <div class="card-body">
+          ${[
+            ['Sunflower Bouquet','10 orders','₹8,490',87],
+            ['Rose Bunch (Pink)','8 orders','₹5,592',72],
+            ['Lavender Wreath','6 orders','₹7,194',65],
+            ['Daisy Gift Set','4 orders','₹5,996',50],
+            ['Tulip Single Stem','12 orders','₹3,588',40],
+          ].map(([name,orders,rev,pct])=>`
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                <span style="font-size:13px;font-weight:500;">${name}</span>
+                <span style="font-size:12px;color:var(--text-muted);">${orders} · <strong>${rev}</strong></span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;"></div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Low Stock Alerts -->
+      <div class="card">
+        <div class="card-header"><span class="card-title">Stock Alerts</span><a href="inventory.html" class="btn btn-ghost btn-sm">Inventory →</a></div>
+        <div class="card-body">
+          <div style="background:var(--red-soft);border:1px solid #f5c0c0;border-radius:8px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-weight:600;font-size:13px;">Peony Bouquet</div><div style="font-size:12px;color:var(--red);">Out of Stock — 0 units</div></div>
+            <button class="btn btn-danger btn-sm" onclick="showToast('Restock opened','info')">Restock</button>
+          </div>
+          <div style="background:var(--yellow-soft);border:1px solid #f5d06a;border-radius:8px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-weight:600;font-size:13px;">Daisy Gift Set</div><div style="font-size:12px;color:var(--yellow);">Low Stock — 3 units</div></div>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Restock opened','info')">Restock</button>
+          </div>
+          <div style="background:var(--yellow-soft);border:1px solid #f5d06a;border-radius:8px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-weight:600;font-size:13px;">Carnation Mix</div><div style="font-size:12px;color:var(--yellow);">Low Stock — 2 units</div></div>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Restock opened','info')">Restock</button>
+          </div>
+          <div style="background:var(--yellow-soft);border:1px solid #f5d06a;border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-weight:600;font-size:13px;">Hibiscus Hairpin</div><div style="font-size:12px;color:var(--yellow);">Low Stock — 1 unit</div></div>
+            <button class="btn btn-outline btn-sm" onclick="showToast('Restock opened','info')">Restock</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebar('dashboard');
+});
+</script>
+</body>
+</html>
