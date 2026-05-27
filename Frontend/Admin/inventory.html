@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory — The Yarn Journey Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Inventory</h1>
+        <p>Track stock levels and set alerts</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-outline" onclick="showToast('Stock report exported','info')">📊 Report</button>
+        <button class="btn btn-primary" onclick="openModal('restockModal')">＋ Restock Item</button>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info"><div class="stat-label">Total Stock Units</div><div class="stat-value">312</div><div class="stat-sub">Across all products</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-info"><div class="stat-label">Low Stock</div><div class="stat-value">3</div><div class="stat-sub warn">Below threshold</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-info"><div class="stat-label">Out of Stock</div><div class="stat-value">1</div><div class="stat-sub" style="color:var(--red);">Needs restock</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info"><div class="stat-label">Well Stocked</div><div class="stat-value">26</div><div class="stat-sub">No action needed</div></div>
+      </div>
+    </div>
+
+    <!-- Low Stock Alert Banner -->
+    <div style="background:var(--yellow-soft);border:1px solid #f5d06a;border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:20px;">⚠️</span>
+      <div>
+        <div style="font-weight:600;font-size:13.5px;color:#9c6e00;">3 items are running low on stock</div>
+        <div style="font-size:12px;color:#b88800;margin-top:2px;">Daisy Gift Set, Carnation Mix, Hibiscus Hairpin are below their alert threshold.</div>
+      </div>
+      <button class="btn btn-outline btn-sm" style="margin-left:auto;border-color:#e6a817;color:#9c6e00;" onclick="showToast('Restock reminders sent','info')">Notify Me</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Stock Levels</span>
+        <div class="filters-row" style="margin:0;">
+          <select class="filter-select" style="min-width:130px;">
+            <option>All Status</option>
+            <option>In Stock</option>
+            <option>Low Stock</option>
+            <option>Out of Stock</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>PRODUCT</th>
+              <th>SKU</th>
+              <th>STOCK QTY</th>
+              <th>ALERT AT</th>
+              <th>STOCK LEVEL</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Restock Modal -->
+<div class="modal-overlay" id="restockModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Restock Item</span>
+      <button class="modal-close" onclick="closeModal('restockModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Select Product</label>
+        <select class="form-select">
+          <option>Choose product…</option>
+          <option>Daisy Gift Set (Stock: 3)</option>
+          <option>Carnation Mix (Stock: 2)</option>
+          <option>Hibiscus Hairpin (Stock: 1)</option>
+          <option>Peony Bouquet (Stock: 0)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Add Quantity</label>
+        <input class="form-input" type="number" placeholder="Units to add" min="1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Update Alert Threshold</label>
+        <input class="form-input" type="number" placeholder="Alert when stock falls below…" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note</label>
+        <textarea class="form-textarea" placeholder="e.g. Restocked from supplier batch #4…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('restockModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="showToast('Stock updated! 📦','success');closeModal('restockModal')">Update Stock</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+const INVENTORY = [
+  { name:'Sunflower Bouquet',   sku:'TYJ-001', stock:12, alert:3,  max:20 },
+  { name:'Rose Bunch (Pink)',   sku:'TYJ-002', stock:8,  alert:3,  max:20 },
+  { name:'Lavender Wreath',     sku:'TYJ-003', stock:5,  alert:3,  max:15 },
+  { name:'Daisy Gift Set',      sku:'TYJ-004', stock:3,  alert:5,  max:15 },
+  { name:'Tulip Single Stem',   sku:'TYJ-005', stock:20, alert:5,  max:30 },
+  { name:'Peony Bouquet',       sku:'TYJ-006', stock:0,  alert:3,  max:15 },
+  { name:'Eucalyptus Wreath',   sku:'TYJ-007', stock:6,  alert:2,  max:12 },
+  { name:'Carnation Mix',       sku:'TYJ-008', stock:2,  alert:4,  max:20 },
+  { name:"Baby's Breath Set",   sku:'TYJ-009', stock:9,  alert:3,  max:15 },
+  { name:'Crochet Bookmark',    sku:'TYJ-010', stock:35, alert:5,  max:50 },
+  { name:'Marigold Bunch',      sku:'TYJ-011', stock:14, alert:4,  max:25 },
+  { name:'Lily Wreath',         sku:'TYJ-012', stock:7,  alert:2,  max:12 },
+  { name:'Hibiscus Hairpin',    sku:'TYJ-013', stock:1,  alert:3,  max:20 },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebar('inventory');
+
+  const tbody = document.getElementById('inventoryTbody');
+  tbody.innerHTML = INVENTORY.map(item => {
+    const pct = Math.round((item.stock / item.max) * 100);
+    let status, badgeClass, barColor;
+    if (item.stock === 0) { status = 'Out of Stock'; badgeClass = 'badge-red'; barColor = 'var(--red)'; }
+    else if (item.stock <= item.alert) { status = 'Low Stock'; badgeClass = 'badge-yellow'; barColor = 'var(--yellow)'; }
+    else { status = 'In Stock'; badgeClass = 'badge-green'; barColor = 'var(--green)'; }
+
+    return `
+    <tr>
+      <td><div class="product-cell"><div class="product-img">🌸</div><div class="product-name">${item.name}</div></div></td>
+      <td style="color:var(--text-muted);font-size:12px;">${item.sku}</td>
+      <td><strong style="${item.stock===0?'color:var(--red)':item.stock<=item.alert?'color:var(--yellow)':''}">${item.stock}</strong></td>
+      <td style="color:var(--text-muted);">${item.alert}</td>
+      <td style="min-width:120px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-bar" style="flex:1;">
+            <div class="progress-fill" style="width:${pct}%;background:${barColor};"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text-muted);width:28px;">${pct}%</span>
+        </div>
+      </td>
+      <td><span class="badge ${badgeClass}">${status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="icon-btn" title="Restock" onclick="openModal('restockModal')">➕</button>
+          <button class="icon-btn" title="Edit alert" onclick="showToast('Alert threshold updated','info')">🔔</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+});
+</script>
+</body>
+</html>
