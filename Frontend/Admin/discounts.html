@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discounts & Promos — The Yarn Journey Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Discounts & Promos</h1>
+        <p>Manage coupons, sales, and promotions</p>
+      </div>
+      <div class="page-header-actions">
+        <button class="btn btn-primary" onclick="openModal('addPromoModal')">＋ Create Promo</button>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-icon">✂️</div>
+        <div class="stat-info"><div class="stat-label">Active Promos</div><div class="stat-value">5</div><div class="stat-sub">Running now</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎟️</div>
+        <div class="stat-info"><div class="stat-label">Coupons Used</div><div class="stat-value">38</div><div class="stat-sub">↑ 12 this week</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💸</div>
+        <div class="stat-info"><div class="stat-label">Total Discounted</div><div class="stat-value">₹6.2k</div><div class="stat-sub neutral">This month</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-info"><div class="stat-label">Expiring Soon</div><div class="stat-value">2</div><div class="stat-sub warn">Within 7 days</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">All Promotions</span></div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>PROMO NAME</th>
+              <th>CODE</th>
+              <th>TYPE</th>
+              <th>VALUE</th>
+              <th>USED</th>
+              <th>EXPIRES</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="promoTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Promo Modal -->
+<div class="modal-overlay" id="addPromoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Create Promotion</span>
+      <button class="modal-close" onclick="closeModal('addPromoModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Promotion Name</label>
+        <input class="form-input" placeholder="e.g. Summer Sale 2026" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Coupon Code</label>
+        <input class="form-input" placeholder="e.g. SUMMER20" style="text-transform:uppercase;" />
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Discount Type</label>
+          <select class="form-select">
+            <option>Percentage (%)</option>
+            <option>Fixed Amount (₹)</option>
+            <option>Free Shipping</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Discount Value</label>
+          <input class="form-input" type="number" placeholder="e.g. 15" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input class="form-input" type="date" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date</label>
+          <input class="form-input" type="date" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Min. Order Amount (₹)</label>
+        <input class="form-input" type="number" placeholder="0 = no minimum" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Usage Limit</label>
+        <input class="form-input" type="number" placeholder="Leave blank for unlimited" />
+      </div>
+      <div class="toggle-row">
+        <span style="font-size:13px;font-weight:500;">Active</span>
+        <button class="toggle on"></button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('addPromoModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="showToast('Promo created! ✂️','success');closeModal('addPromoModal')">Create Promo</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+const PROMOS = [
+  { name:'Mother\'s Day Sale',   code:'MOM20',    type:'Percentage', value:'20%',    used:14, expires:'31 May 2026', status:'Active' },
+  { name:'Welcome Discount',     code:'WELCOME10', type:'Percentage', value:'10%',    used:8,  expires:'30 Jun 2026', status:'Active' },
+  { name:'Bulk Order Deal',      code:'BULK15',    type:'Percentage', value:'15%',    used:5,  expires:'15 Jun 2026', status:'Active' },
+  { name:'Free Shipping Day',    code:'FREESHIP',  type:'Free Ship',  value:'₹0',     used:6,  expires:'29 May 2026', status:'Expiring' },
+  { name:'Festive Flat Off',     code:'FEST100',   type:'Fixed',      value:'₹100',   used:5,  expires:'30 May 2026', status:'Expiring' },
+  { name:'Valentine\'s 2026',    code:'LOVE25',    type:'Percentage', value:'25%',    used:22, expires:'14 Feb 2026', status:'Expired' },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebar('discounts');
+  initToggles();
+
+  const tbody = document.getElementById('promoTbody');
+  tbody.innerHTML = PROMOS.map(p => {
+    const sb = p.status === 'Active' ? 'badge-green' : p.status === 'Expiring' ? 'badge-yellow' : 'badge-gray';
+    return `
+    <tr>
+      <td><span style="font-weight:500;">${p.name}</span></td>
+      <td><code style="background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${p.code}</code></td>
+      <td><span style="color:var(--text-mid);font-size:13px;">${p.type}</span></td>
+      <td><strong>${p.value}</strong></td>
+      <td><span>${p.used}</span></td>
+      <td><span style="font-size:12px;color:${p.status==='Expiring'?'var(--yellow)':'var(--text-muted)'};">${p.expires}</span></td>
+      <td><span class="badge ${sb}">${p.status}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="icon-btn" onclick="showToast('Editing promo','info')">✏️</button>
+          <button class="icon-btn danger" onclick="showToast('Promo deleted','error')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+});
+</script>
+</body>
+</html>
