@@ -2,14 +2,10 @@
    THE YARN JOURNEY — Shared Navigation JS
    ============================================= */
 
-const ADMIN_API_BASE = (() => {
-  const isLocalFrontend = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-    && window.location.port !== '3000';
-  const localApiHost = window.location.hostname === 'localhost' ? 'localhost' : '127.0.0.1';
-  return isLocalFrontend || window.location.protocol === 'file:'
-    ? `http://${localApiHost}:3000/api`
-    : '/api';
-})();
+const API_BASE = window.location.hostname === 'localhost' || 
+                 window.location.hostname === '127.0.0.1'
+  ? 'http://127.0.0.1:3000/api'
+  : 'https://crochet-website-7n9s.onrender.com/api';
 
 
 let adminCurrentUser = null;
