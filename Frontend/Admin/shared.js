@@ -38,38 +38,6 @@ const post = (url, data) =>
     body: JSON.stringify(data)
   });
 
-window.API = {
-  products: {
-    getAll: () => get("/product?limit=200")
-  },
-
-  categories: {
-    getAll: () => get("/product/categories")
-  },
-
-  analytics: {
-    getStats: () => get("/analytics")
-  },
-
-  users: {
-  getMe: () => get("/auth/get-me"),
-
-  updateProfile: (data) =>
-    adminFetchJson(`${ADMIN_API_BASE}/user/profile`, {
-      method: "PUT",
-      body: JSON.stringify(data)
-    }),
-
-  changePassword: (data) =>
-    adminFetchJson(`${ADMIN_API_BASE}/user/change-password`, {
-      method: "PUT",
-      body: JSON.stringify(data)
-    })
-},
-contact: {
-    getMessages: () => get("/contact/messages")
-  }
-};
 
 
 function getAdminPageRedirect() {
@@ -94,7 +62,7 @@ function updateAdminIdentity(user) {
 
 async function requireAdmin() {
   try {
-    const data = await adminFetchJson(`${ADMIN_API_BASE}/auth/get-me`);
+    const data = await API.users.getMe();
     adminCurrentUser = data.user || null;
 
     if (!adminCurrentUser || adminCurrentUser.role !== 'admin') {
@@ -113,7 +81,7 @@ async function requireAdmin() {
 
 async function logoutAdmin() {
   try {
-    await adminFetchJson(`${ADMIN_API_BASE}/auth/logout`, { method: 'GET' });
+    await API.auth.logout()  
   } catch (error) {
     console.warn(error);
   }
