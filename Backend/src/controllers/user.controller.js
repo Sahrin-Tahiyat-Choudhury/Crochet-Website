@@ -6,10 +6,10 @@ const tokenBlacklistModel = require('../models/blacklist.model');
 
 async function updateProfile(req, res) {
     try {
-        const { username, email } = req.body;
+        const { username, email, phone, city } = req.body;
         
         const updatedUser = await userModel.findByIdAndUpdate(req.user.id, 
-        { username, email },                 // Fields to update
+        { username, email, phone, city },                 // Fields to update
         { new: true }).select("-password"); // Exclude password from the response
         res.status(200).json({
             message: "Profile updated successfully",
@@ -41,5 +41,26 @@ async function changePassword(req, res) {
     }
 }
 
-module.exports = { updateProfile, changePassword };
+async function uploadPhoto(req, res) {
+    try {
+        if (!req.body.photo) {
+            return res.status(400).json({ message: "No photo provided" });
+        }
+
+        const user = await userModel.findByIdAndUpdate(
+            req.user.id,
+            { photo: req.body.photo },
+            { new: true }
+        ).select("-password");
+
+        res.status(200).json({
+            message: "Photo updated successfully",
+            user
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error uploading photo", error });
+    }
+}
+
+module.exports = { updateProfile, changePassword, uploadPhoto };
 

@@ -2,12 +2,19 @@ const productModel = require('../models/product.model');
 const categoryModel = require('../models/category.model');
 const {uploadFile} = require('../services/storage.services');
 const jwt = require('jsonwebtoken');
+const csv = require('csv-parser');
+const stream = require('stream');
+
 
 async function createProduct(req, res) {
 
-    const { name, description,material, careInstructions, stockQuantity, isFeatured, isHidden} = req.body;
-    const originalPrice = req.body.price?.originalPrice ?? req.body['price.originalPrice'];
-    const sellingPrice = req.body.price?.sellingPrice ?? req.body['price.sellingPrice'];
+    const { name, description, colors,material,careInstructions,lowStockAlertAt, isFeatured, isHidden,isDraft} = req.body;
+    console.log("req.body =", req.body);
+    console.log("colors =", colors);
+    //const colors = req.body.colors? req.body.colors.split(',').map(c => c.trim()): [];
+    const originalPrice = Number(req.body.price?.originalPrice ?? req.body['price.originalPrice'] ?? 0);
+    const sellingPrice  = Number(req.body.price?.sellingPrice  ?? req.body['price.sellingPrice']  ?? 0);
+    const stockQuantity = Number(req.body.stockQuantity ?? 0);
     
     const file = req.file;
     if (!file) {
@@ -15,24 +22,32 @@ async function createProduct(req, res) {
     }
     const result = await uploadFile(file.buffer.toString('base64'));
 
-    const discountPercentage = originalPrice > sellingPrice ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
+    //const discountPercentage = originalPrice > sellingPrice ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
 
+    
     const product = await productModel.create({
         uri: result.url,
         name,
         description,
+        colors: colors? colors.split(',').map(c => c.trim()):[],
         price: {
             originalPrice,
             sellingPrice
         },
-        isFeatured,
-        isHidden,
+        isFeatured: isFeatured === 'true' || isFeatured === true,
+        isHidden:   isHidden   === 'true' || isHidden   === true,
+        isDraft:    isDraft    === 'true' || isDraft    === true,
         material,
         careInstructions,
-        stockQuantity,
+        stockQuantity: Number(stockQuantity),
+        lowStockAlertAt,
         admin: req.user.id,
     })
-
+if (product.category) {
+    await categoryModel.findByIdAndUpdate(product.category, {
+        $addToSet: { products: product._id }
+    });
+}
     res.status(201).json({
         message: "Product created successfully",
         product: {
@@ -43,6 +58,7 @@ async function createProduct(req, res) {
             material: product.material,
             careInstructions: product.careInstructions,
             stockQuantity: product.stockQuantity,
+            lowStockAlertAt:product.lowStockAlertAt,
             originalPrice: product.price.originalPrice,
             sellingPrice: product.price.sellingPrice,
             discountPercentage: product.discountPercentage,
@@ -78,24 +94,32 @@ async function createCategory(req, res) {
         })
 }
 
+// new code
 async function getAllProducts(req, res) {
-        
+    const { page = 1, limit = 50 } = req.query;  // accept from frontend
+
     const products = await productModel
         .find()
-        .skip(0)
-        .limit(10)
-        .select("name image price");
+        .populate('category', 'name')
+        .skip((page - 1) * limit)
+        .limit(Number(limit))
+        .select('name uri description price category isFeatured stockQuantity isHidden isDraft material careInstructions colors createdAt');
+
+    const total = await productModel.countDocuments();
 
     res.status(200).json({
-            message: "Products fetched successfully",
-            products: products,
-        })
-    }
+        message: 'Products fetched successfully',
+        products,
+        total,        // send total so frontend can paginate correctly
+        page: Number(page),
+        limit: Number(limit)
+    });
+}
 
 async function getProductById(req, res) {
     const productId = req.params.productId; 
 
-    const product = await productModel.findById(productId).populate("name category ");
+    const product = await productModel.findById(productId).populate("category");
 
     if (!product) {
         return res.status(404).json({ message: "Product not found" });
@@ -108,7 +132,12 @@ async function getProductById(req, res) {
 }
 
 async function getAllCategories(req, res) {
-    const categories = await categoryModel.find().select("name admin").populate("admin","username email");
+    const categories = await categoryModel
+    .find()
+    .select("name admin products isHidden order")
+    .populate("admin","username email")
+    .populate("products", "_id")
+    .sort({ order: 1 });
 
     res.status(200).json({
             message: "Categories fetched successfully",
@@ -132,30 +161,38 @@ async function getCategoryById(req, res) {
 */
 async function editProduct(req, res) {
     try{
-        const { productId, name, description, material, careInstructions, stockQuantity, originalPrice, sellingPrice, isFeatured, isHidden } = req.body;
+        console.log("EDIT BODY:", req.body);
+        const { productId, name, description,colors, material, careInstructions, stockQuantity, originalPrice, sellingPrice, isFeatured, isHidden, isDraft,category } = req.body;
+        
+        const oldProduct = await productModel.findById(productId);
+         if (!oldProduct) return res.status(404).json({ message: "Product not found" });
+
+
         const product = await productModel.findByIdAndUpdate(productId,
-            { name, description, material, careInstructions, stockQuantity, price: { originalPrice, sellingPrice }, isFeatured, isHidden },
+            { name, description,colors, material,careInstructions, stockQuantity, price: { originalPrice, sellingPrice }, isFeatured, isHidden, isDraft,category },
             { new: true });
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
+         // if category changed, update the category's products arrays
+        const oldCatId = String(oldProduct.category || '');
+        const newCatId = String(category || '');
+
+        if (oldCatId !== newCatId) {
+            if (oldProduct.category) {
+                await categoryModel.findByIdAndUpdate(oldProduct.category, {
+                    $pull: { products: productId }
+                });
+            }
+            if (category) {
+                await categoryModel.findByIdAndUpdate(category, {
+                    $addToSet: { products: productId }
+                });
+            }
+        }
         res.status(200).json({
             message: "Product updated successfully",
-            product: {
-                id: product._id,
-                uri: product.uri,
-                name: product.name,
-                description: product.description,
-                material: product.material,
-                careInstructions: product.careInstructions,
-                stockQuantity: product.stockQuantity,
-                originalPrice: product.price.originalPrice,
-                sellingPrice: product.price.sellingPrice,
-                discountPercentage: product.discountPercentage,
-                isFeatured: product.isFeatured,
-                isHidden: product.isHidden, 
-                admin: product.admin
-            }
+            product
         })
 
     }catch (error) {
@@ -170,6 +207,13 @@ async function deleteProduct(req, res) {
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
+        if (product.category) {
+            await categoryModel.findByIdAndUpdate(product.category, {
+                $pull: { products: productId }
+            });
+        }
+
+
         res.status(200).json({
             message: "Product deleted successfully",
         })
@@ -292,4 +336,71 @@ async function filterAndSortProducts(req, res) {
     }
 }
 
-module.exports = { createProduct, createCategory, getAllProducts, getAllCategories, getCategoryById, getProductById, editProduct, deleteProduct, editCategory, deleteCategory, filterAndSortProducts };
+/**
+ * Imports products from a CSV file.
+ * 
+ * Expected CSV columns:
+ * - name (string, required)
+ * - description (string, required)
+ * - originalPrice (number, required)
+ * - sellingPrice (number, required)
+ * - stockQuantity (number, required)
+ * - colors (string, optional, comma-separated)
+ * 
+ * The CSV file must be sent as form-data field 'file'.
+ */
+async function importProducts(req, res) {
+
+  if (!req.file) {
+    return res.status(400).json({ message: "CSV file is required and must be sent as form-data field 'csv'" });
+  }
+
+  const products = [];
+
+  const bufferStream = new stream.PassThrough();
+  bufferStream.end(req.file.buffer);
+
+  bufferStream
+    .pipe(csv())
+    .on('data', row => {
+      products.push({
+        name: row.name || "Untitled",
+        description: row.description || "",
+        price: {
+          originalPrice:  row.originalPrice ? Number(row.originalPrice) : 0,
+          sellingPrice: row.sellingPrice ? Number(row.sellingPrice) : 0,
+        },
+        stockQuantity: row.stockQuantity?Number(row.stockQuantity):0,
+        colors: row.colors ? row.colors.split(',').map(c => c.trim()) : [],
+        material: row.material || "",
+        careInstructions: row.careInstructions || "",
+        isFeatured: row.isFeatured === "true",
+        isHidden: row.isHidden === "true",
+        isDraft: row.isDraft === "true",
+        uri: row.uri || (row.name ? row.name.toLowerCase().replace(/\s+/g, '-') : 'untitled'),
+        admin: req.user?.id || null
+      });
+    })
+    .on('end', async () => {
+      try {
+        console.log("req.user:", req.user);
+        console.log("products:", products);
+
+
+        await productModel.insertMany(products);
+        res.json({
+          message: 'Products imported successfully',
+          count: products.length
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: 'Error importing products',
+          error: error.message
+        });
+      }
+    });
+}
+      
+
+
+module.exports = { createProduct, createCategory, getAllProducts, getAllCategories, getCategoryById, getProductById, editProduct, deleteProduct, editCategory, deleteCategory, filterAndSortProducts, importProducts };

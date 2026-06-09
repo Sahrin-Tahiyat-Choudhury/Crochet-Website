@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Messages</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+<div class="main-content">
+    <h1>📩 Contact Messages</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+            </tr>
+            
+        </thead>
+
+        <tbody id="contact-messages-body"></tbody>
+    </table>
+
+    <div id="messageModal" class="modal-overlay">
+    <div class="modal">
+        <h3>Contact Message</h3>
+
+        <p><strong>Name:</strong> <span id="modal-name"></span></p>
+        <p><strong>Email:</strong> <span id="modal-email"></span></p>
+        <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
+
+        <div>
+            <strong>Message:</strong>
+            <p id="modal-message"></p>
+        </div>
+
+        <button onclick="closeMessageModal()">Close</button>
+    </div>
+</div>
+</div>
+
+<script src="shared.js"></script>
+<script src="contact.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    renderSidebar('contact');
+    loadMessages();
+});
+</script>
+
+</body>
+</html>

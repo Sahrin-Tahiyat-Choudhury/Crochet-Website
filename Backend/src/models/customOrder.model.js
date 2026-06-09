@@ -9,8 +9,22 @@ const customOrderSchema = new mongoose.Schema({
         },
         productType:{
             type: String,
-            enum: ['bouquet','keychain','mini pot','other'],
             required: true
+        },
+        bouquetSize: {
+            type: String,
+            default: ""
+        },
+        flowerSelection: [{
+            type: String
+        }],
+        wrapperStyle: {
+            type: String,
+            default: ""
+        },
+        occasion:{
+            type: String,
+            default: ""
         },
         description: {
             type: String,

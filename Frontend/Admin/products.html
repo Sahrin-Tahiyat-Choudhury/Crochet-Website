@@ -4,21 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Products — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="admin-layout">
   <aside class="sidebar" id="sidebar"></aside>
 
   <main class="main-content">
+
     <!-- Page Header -->
     <div class="page-header">
       <div class="page-header-left">
         <h1>Product Management</h1>
-        <p>Manage your crochet flower collection · 30 products</p>
+        <p id="productsSub">Loading products…</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-outline" onclick="showToast('CSV export started…','info')">⬇️ Import</button>
+        <button class="btn btn-outline btn-sm" onclick="exportProductsCSV()">📤 Export CSV</button>
         <button class="btn btn-primary" onclick="openModal('addProductModal')">＋ Add Product</button>
       </div>
     </div>
@@ -29,70 +30,70 @@
         <div class="stat-icon">🧶</div>
         <div class="stat-info">
           <div class="stat-label">Total Products</div>
-          <div class="stat-value">30</div>
-          <div class="stat-sub">↑ 3 this month</div>
+          <div class="stat-value" id="totalProducts">—</div>
+          <div class="stat-sub" id="activeListingsSub">Loading…</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">✅</div>
         <div class="stat-info">
           <div class="stat-label">Active Listings</div>
-          <div class="stat-value">24</div>
-          <div class="stat-sub">↑ 2 this week</div>
+          <div class="stat-value" id="activeListings">—</div>
+          <div class="stat-sub" id="lowStockSub">Loading…</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">⚠️</div>
         <div class="stat-info">
           <div class="stat-label">Low Stock Items</div>
-          <div class="stat-value">3</div>
-          <div class="stat-sub warn">↑ 1 alert new</div>
+          <div class="stat-value" id="lowStockCount">—</div>
+          <div class="stat-sub warn" id="lowStockAlertSub">Loading…</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">✂️</div>
         <div class="stat-info">
           <div class="stat-label">Active Discounts</div>
-          <div class="stat-value">5</div>
-          <div class="stat-sub neutral">Running now</div>
+          <div class="stat-value" id="activeDiscounts">—</div>
+          <div class="stat-sub neutral" id="discountsSub">Loading…</div>
         </div>
       </div>
     </div>
 
-    <!-- Products Table -->
+    <!-- Products Table Card -->
     <div class="card">
       <div class="card-header">
         <span class="card-title">All Products</span>
-        <button class="btn btn-outline btn-sm" onclick="showToast('Exporting CSV…','info')">Export CSV</button>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="file" id="csvFile" accept=".csv" style="font-size:12px;color:var(--text-muted);" />
+          <button class="btn btn-outline btn-sm" onclick="importProducts()">📥 Import CSV</button>
+        </div>
       </div>
 
       <div class="card-body" style="padding-bottom:0;">
         <div class="filters-row">
           <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search products, SKU, description…" oninput="filterProducts(this.value)" />
+            <input type="text" placeholder="Search products, ID, description…" oninput="filterProducts(this.value)" />
           </div>
-          <select class="filter-select" onchange="filterProducts()">
-            <option>All Categories</option>
-            <option>Flower Bouquets</option>
-            <option>Single Flowers</option>
-            <option>Wreaths</option>
-            <option>Gift Sets</option>
-            <option>Accessories</option>
+          <select id="categoryFilter" class="filter-select" onchange="applyFilters()">
+            <option value="All Categories">All Categories</option>
           </select>
-          <select class="filter-select" onchange="filterProducts()">
-            <option>All Status</option>
-            <option>Active</option>
-            <option>Draft</option>
-            <option>Low Stock</option>
-            <option>Out of Stock</option>
+          <select id="statusFilter" class="filter-select" onchange="applyFilters()">
+            <option value="All Status">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Draft">Draft</option>
+            <option value="Hidden">Hidden</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
           </select>
-          <select class="filter-select" style="min-width:120px;">
-            <option>Sort: Newest</option>
-            <option>Sort: Oldest</option>
-            <option>Price: Low→High</option>
-            <option>Price: High→Low</option>
-            <option>Name A–Z</option>
+          <select id="sortSelect" class="filter-select" style="min-width:140px;" onchange="sortProducts()">
+            <option value="newest">Sort: Newest</option>
+            <option value="oldest">Sort: Oldest</option>
+            <option value="price_asc">Price: Low → High</option>
+            <option value="price_desc">Price: High → Low</option>
+            <option value="name_asc">Name A–Z</option>
+            <option value="name_desc">Name Z–A</option>
           </select>
         </div>
       </div>
@@ -104,6 +105,7 @@
               <th>PRODUCT</th>
               <th>CATEGORY</th>
               <th>PRICE</th>
+              <th>DISCOUNT</th>
               <th>COLORS</th>
               <th>STOCK</th>
               <th>STATUS</th>
@@ -111,110 +113,353 @@
             </tr>
           </thead>
           <tbody id="productsTbody">
-            <!-- Populated by JS -->
+            <tr>
+              <td colspan="8">
+                <div class="empty-state">
+                  <div class="empty-icon">🌸</div>
+                  <h3>Loading products…</h3>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
       <div class="pagination">
-        <span id="paginationInfo">Showing 1–10 of 30 products</span>
-        <div class="pagination-pages">
-          <button class="page-btn" disabled>‹</button>
-          <button class="page-btn active">1</button>
-          <button class="page-btn" onclick="goPage(2)">2</button>
-          <button class="page-btn" onclick="goPage(3)">3</button>
-          <button class="page-btn" onclick="goPage(2)">›</button>
-        </div>
+        <span id="paginationInfo">Loading…</span>
+        <div class="pagination-pages" id="paginationButtons"></div>
       </div>
     </div>
+
   </main>
 </div>
 
-<!-- Add Product Modal -->
+<!-- ============================================================
+     ADD PRODUCT MODAL
+     ============================================================ -->
 <div class="modal-overlay" id="addProductModal">
-  <div class="modal">
+  <div class="modal" style="max-width:600px;">
     <div class="modal-header">
       <span class="modal-title">Add New Product</span>
       <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="form-section-title">BASIC INFO</div>
+
+      <div class="form-section-title">PRODUCT IMAGE</div>
       <div class="form-group">
-        <label class="form-label">Product Name</label>
-        <input class="form-input" placeholder="e.g. Handmade Crochet Market Bag" />
+        <label class="form-label">Upload Image</label>
+        <input id="productImage" type="file" accept="image/*" style="width:100%;padding:8px;border:1px dashed var(--border);border-radius:var(--radius-sm);background:#fafafa;cursor:pointer;" />
+        <div class="form-hint">Required. Will be uploaded to Cloudinary.</div>
       </div>
+
+      <div class="form-section-title" style="margin-top:18px;">BASIC INFO</div>
+      <div class="form-group">
+        <label class="form-label">Product Name <span style="color:var(--red)">*</span></label>
+        <input id="productName" class="form-input" placeholder="e.g. Blush Rose Bouquet" />
+      </div>
+
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Category</label>
-          <select class="form-select">
-            <option>Flower Bouquets</option>
-            <option>Single Flowers</option>
-            <option>Wreaths</option>
-            <option>Gift Sets</option>
-            <option>Accessories</option>
+          <select id="productCategory" class="form-select">
+            <option value="">Uncategorized</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">SKU / Product Code</label>
-          <input class="form-input" placeholder="TYJ-001" />
+          <label class="form-label">SKU / Product Code <span style="color:var(--red)">*</span></label>
+          <input id="productSku" class="form-input" placeholder="TYJ-001" />
         </div>
       </div>
+
       <div class="form-group">
-        <label class="form-label">Product Description</label>
-        <textarea class="form-textarea" placeholder="Describe materials, size, care instructions, customization options…"></textarea>
+        <label class="form-label">Description</label>
+        <textarea id="productDescription" class="form-textarea" placeholder="Describe the product…"></textarea>
       </div>
 
-      <div class="form-section-title">PRICING & DISCOUNTS</div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Regular Price (₹)</label>
-          <input class="form-input" type="number" placeholder="0.00" />
+          <label class="form-label">Material</label>
+          <input id="productMaterial" class="form-input" placeholder="e.g. Acrylic yarn" />
         </div>
         <div class="form-group">
-          <label class="form-label">Sale Price (₹)</label>
-          <input class="form-input" type="number" placeholder="0.00" />
+          <label class="form-label">Colors <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(comma-separated)</span></label>
+          <input id="productColors" class="form-input" placeholder="red, pink, white" />
         </div>
-      </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">Discount Type</label>
-          <select class="form-select">
-            <option>None</option>
-            <option>Percentage</option>
-            <option>Fixed Amount</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Discount Value</label>
-          <input class="form-input" placeholder="e.g. 20 for 20%" />
-        </div>
-      </div>
-      <div class="toggle-row">
-        <span style="font-size:13px;font-weight:500;">Mark as On Sale</span>
-        <button class="toggle" id="saleToggle"></button>
       </div>
 
-      <div class="form-section-title" style="margin-top:18px;">INVENTORY & STOCK</div>
+      <div class="form-group">
+        <label class="form-label">Care Instructions</label>
+        <input id="productCareInstructions" class="form-input" placeholder="e.g. Dust gently, keep away from moisture" />
+      </div>
+
+      <div class="form-section-title" style="margin-top:18px;">PRICING</div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Stock Quantity</label>
-          <input class="form-input" type="number" placeholder="e.g. 15" />
+          <label class="form-label">Regular Price (₹) <span style="color:var(--red)">*</span></label>
+          <input id="originalPrice" class="form-input" type="number" min="0" placeholder="0" oninput="updateDiscountPreview()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sale Price (₹) <span style="color:var(--red)">*</span></label>
+          <input id="sellingPrice" class="form-input" type="number" min="0" placeholder="0" oninput="updateDiscountPreview()" />
+        </div>
+      </div>
+      <div id="discountPreview" style="font-size:13px;color:var(--green);margin-top:-10px;margin-bottom:14px;font-weight:500;"></div>
+
+      <div class="form-section-title" style="margin-top:18px;">INVENTORY</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Stock Quantity <span style="color:var(--red)">*</span></label>
+          <input id="stockQuantity" class="form-input" type="number" min="0" placeholder="0" />
         </div>
         <div class="form-group">
           <label class="form-label">Low Stock Alert At</label>
-          <input class="form-input" type="number" placeholder="e.g. 3" />
+          <input id="addLowStockAlertAt" class="form-input" type="number" min="0" placeholder="e.g. 3" />
         </div>
       </div>
+
+      <div class="form-section-title" style="margin-top:18px;">VISIBILITY</div>
+      <div class="toggle-row">
+        <span style="font-size:13px;font-weight:500;">Mark as Featured</span>
+        <button class="toggle" id="addIsFeaturedToggle"></button>
+      </div>
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('addProductModal')">Cancel</button>
-      <button class="btn btn-outline" onclick="showToast('Saved as draft','info');closeModal('addProductModal')">Save as Draft</button>
-      <button class="btn btn-primary" onclick="showToast('Product published! 🌸','success');closeModal('addProductModal')">✔ Publish Product</button>
+      <button class="btn btn-outline" onclick="saveDraftProduct()">Save as Draft</button>
+      <button class="btn btn-primary" onclick="validateAndPublishProduct()">✔ Publish Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT PRODUCT MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="editProductModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <span class="modal-title">Edit Product</span>
+      <button class="modal-close" onclick="closeModal('editProductModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editProductId" />
+
+      <div class="form-section-title">BASIC INFO</div>
+      <div class="form-group">
+        <label class="form-label">Product Name</label>
+        <input id="editProductName" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea id="editProductDescription" class="form-textarea"></textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Material</label>
+          <input id="editMaterial" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Colors <span style="color:var(--text-muted);font-weight:400;text-transform:none;">(comma-separated)</span></label>
+          <input id="editProductColors" class="form-input" placeholder="red, pink, white" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Care Instructions</label>
+        <input id="editCareInstructions" class="form-input" />
+      </div>
+
+      <div class="form-section-title" style="margin-top:18px;">PRICING</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Original Price (₹)</label>
+          <input id="editOriginalPrice" type="number" class="form-input" oninput="updateEditDiscountPreview()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Selling Price (₹)</label>
+          <input id="editSellingPrice" type="number" class="form-input" oninput="updateEditDiscountPreview()" />
+        </div>
+      </div>
+      <div id="editDiscountPreview" style="font-size:13px;color:var(--green);margin-top:-10px;margin-bottom:14px;font-weight:500;"></div>
+
+      <div class="form-section-title" style="margin-top:18px;">INVENTORY</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Stock Quantity</label>
+          <input id="editStockQuantity" type="number" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Low Stock Alert At</label>
+          <input id="lowStockAlertAt" type="number" class="form-input" placeholder="e.g. 3" />
+        </div>
+      </div>
+
+      <div class="form-section-title" style="margin-top:18px;">STATUS & CATEGORY</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="editStatus" class="form-select">
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+            <option value="hidden">Hidden</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="editCategory" class="form-select">
+            <option value="">Uncategorized</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <span style="font-size:13px;font-weight:500;">Featured Product</span>
+        <input type="checkbox" id="editIsFeatured" style="width:18px;height:18px;cursor:pointer;accent-color:var(--accent);" />
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editProductModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="updateProduct()">Save Changes</button>
     </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
-<script src="products.js"></script>
+<script src="../api.js"></script>
+<script src="product.js"></script>
+<script>
+
+/* ---------- Discount preview helpers ---------- */
+function updateDiscountPreview() {
+  const mrp  = Number(document.getElementById('originalPrice').value);
+  const sell = Number(document.getElementById('sellingPrice').value);
+  const el   = document.getElementById('discountPreview');
+  if (mrp > 0 && sell > 0 && mrp > sell) {
+    const disc = Math.round(((mrp - sell) / mrp) * 100);
+    el.textContent = `✓ ${disc}% discount will be applied automatically`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function updateEditDiscountPreview() {
+  const mrp  = Number(document.getElementById('editOriginalPrice').value);
+  const sell = Number(document.getElementById('editSellingPrice').value);
+  const el   = document.getElementById('editDiscountPreview');
+  if (mrp > 0 && sell > 0 && mrp > sell) {
+    const disc = Math.round(((mrp - sell) / mrp) * 100);
+    el.textContent = `✓ ${disc}% discount will be applied automatically`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+/* ---------- Populate Add modal category dropdown ---------- */
+async function populateAddCategorySelect() {
+  try {
+    const data = await API.categories.getAll();
+    const sel  = document.getElementById('productCategory');
+    sel.innerHTML = '<option value="">Uncategorized</option>';
+    (data.categories || []).forEach(cat => {
+      sel.innerHTML += `<option value="${cat._id}">${cat.name}</option>`;
+    });
+  } catch (e) { /* silent */ }
+}
+
+/* ---------- Validation & publish ---------- */
+async function validateAndPublishProduct() {
+  const name     = document.getElementById('productName').value.trim();
+  const sku      = document.getElementById('productSku').value.trim();
+  const origP    = document.getElementById('originalPrice').value;
+  const sellP    = document.getElementById('sellingPrice').value;
+  const stock    = document.getElementById('stockQuantity').value;
+  const imgFile  = document.getElementById('productImage').files[0];
+
+  if (!name)                              return showToast('Product name is required', 'error');
+  if (!sku)                               return showToast('SKU is required', 'error');
+  if (!origP || Number(origP) <= 0)       return showToast('Enter a valid original price', 'error');
+  if (!sellP || Number(sellP) <= 0)       return showToast('Enter a valid selling price', 'error');
+  if (stock === '' || Number(stock) < 0)  return showToast('Enter a valid stock quantity', 'error');
+  if (!imgFile)                           return showToast('Please select a product image', 'error');
+
+  await publishProduct();
+}
+
+async function publishProduct() {
+  try {
+    const formData = new FormData();
+    formData.append('name',              document.getElementById('productName').value);
+    formData.append('description',       document.getElementById('productDescription').value);
+    formData.append('stockQuantity',     document.getElementById('stockQuantity').value);
+    formData.append('price.originalPrice', document.getElementById('originalPrice').value);
+    formData.append('price.sellingPrice',  document.getElementById('sellingPrice').value);
+    formData.append('colors',            document.getElementById('productColors').value);
+    formData.append('material',          document.getElementById('productMaterial').value);
+    formData.append('careInstructions',  document.getElementById('productCareInstructions').value);
+    formData.append('isFeatured',        document.getElementById('addIsFeaturedToggle').classList.contains('on'));
+    formData.append('isHidden',          false);
+    formData.append('isDraft',           false);
+    formData.append('image',             document.getElementById('productImage').files[0]);
+
+    const catVal = document.getElementById('productCategory').value;
+    if (catVal) formData.append('category', catVal);
+
+    const response = await fetch('http://127.0.0.1:3000/api/product/upload', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to create product');
+
+    showToast('Product created successfully 🌸', 'success');
+    closeModal('addProductModal');
+    await loadProducts();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message, 'error');
+  }
+}
+
+async function saveDraftProduct() {
+  try {
+    const formData = new FormData();
+    formData.append('name',              document.getElementById('productName').value || 'Draft Product');
+    formData.append('description',       document.getElementById('productDescription').value || '');
+    formData.append('price.originalPrice', document.getElementById('originalPrice').value || 1);
+    formData.append('price.sellingPrice',  document.getElementById('sellingPrice').value  || 1);
+    formData.append('stockQuantity',     document.getElementById('stockQuantity').value   || 0);
+    formData.append('colors',            document.getElementById('productColors').value);
+    formData.append('material',          document.getElementById('productMaterial').value);
+    formData.append('careInstructions',  document.getElementById('productCareInstructions').value);
+    formData.append('isDraft',           true);
+    formData.append('isHidden',          false);
+    formData.append('isFeatured',        false);
+
+    const imgFile = document.getElementById('productImage').files[0];
+    if (imgFile) formData.append('image', imgFile);
+
+    const response = await fetch('http://127.0.0.1:3000/api/product/upload', {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to save draft');
+
+    showToast('Draft saved successfully', 'success');
+    closeModal('addProductModal');
+    await loadProducts();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message, 'error');
+  }
+}
+
+</script>
 </body>
 </html>

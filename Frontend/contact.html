@@ -18,6 +18,7 @@
       <li><a href="home.html">Shop</a></li>
       <li><a href="product.html">Products</a></li>
       <li><a href="cart.html">Cart</a></li>
+      <li><a href="orders.html">My Orders</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
@@ -42,10 +43,13 @@
     <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
     <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
     <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="orders.html" onclick="toggleMobileNav()">My Orders</a></li>
     <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
     <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
   </ul>
 </div>
+
+<!-- ─── Contact Section ──────────────────────────────────────────────────── -->
 <section id="contact" class="contact-bg">
   <div class="contact-inner">
     <div>
@@ -54,45 +58,69 @@
       <p class="section-sub">Whether you have a question, want to place a custom order, or just want to say hi — we're always happy to chat!</p>
       <div class="contact-links">
         <a href="https://www.instagram.com/theyarnjourney" class="contact-link" target="_blank">
-          <span class="cl-icon">📸</span><div class="cl-text"><strong>Instagram DM</strong><span>@theyarnjourney — Quickest response!</span></div>
+          <span class="cl-icon">📸</span>
+          <div class="cl-text"><strong>Instagram DM</strong><span>@theyarnjourney — Quickest response!</span></div>
         </a>
         <a href="mailto:theyarnjourney.shop@gmail.com" class="contact-link">
-          <span class="cl-icon">✉️</span><div class="cl-text"><strong>Email Us</strong><span>theyarnjourney.shop@gmail.com</span></div>
+          <span class="cl-icon">✉️</span>
+          <div class="cl-text"><strong>Email Us</strong><span>theyarnjourney.shop@gmail.com</span></div>
         </a>
         <a href="https://www.facebook.com/share/18hX2TecDq/" class="contact-link" target="_blank">
-          <span class="cl-icon">👍</span><div class="cl-text"><strong>Facebook</strong><span>theyarnjourney</span></div>
+          <span class="cl-icon">👍</span>
+          <div class="cl-text"><strong>Facebook</strong><span>theyarnjourney</span></div>
         </a>
         <div class="contact-link" style="cursor:default">
-          <span class="cl-icon">📍</span><div class="cl-text"><strong>Location</strong><span>Guwahati, Assam, India</span></div>
+          <span class="cl-icon">📍</span>
+          <div class="cl-text"><strong>Location</strong><span>Guwahati, Assam, India</span></div>
         </div>
       </div>
-      <p style="margin-top:18px;font-size:13px;color:var(--brown-light);line-height:1.6;">For custom orders, please contact via <strong style="color:var(--brown)">Instagram DM</strong>.</p>
+      <p style="margin-top:18px;font-size:13px;color:var(--brown-light);line-height:1.6;">
+        For custom orders, please contact via <strong style="color:var(--brown)">Instagram DM</strong>.
+      </p>
     </div>
+
+    <!-- Contact Form -->
     <div class="contact-form-wrap">
       <h3 style="font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--dark);margin-bottom:22px">Send a Message</h3>
-      <div class="form-row"><label class="form-label">Your Name</label><input type="text" class="form-input" placeholder="Your name"></div>
-      <div class="form-row"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="your@email.com"></div>
-      <div class="form-row"><label class="form-label">Subject</label><input type="text" class="form-input" placeholder="What's it about?"></div>
-      <div class="form-row"><label class="form-label">Message</label><textarea class="form-textarea" placeholder="Your message..."></textarea></div>
-      <button class="btn-primary" style="width:100%;padding:14px" onclick="showToast('✅ Message sent! We\'ll reply soon.')">Send Message →</button>
+      <div class="form-row">
+        <label class="form-label">Your Name</label>
+        <input id="contact-name" type="text" class="form-input" placeholder="Your name">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Email</label>
+        <input id="contact-email" type="email" class="form-input" placeholder="your@email.com">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Subject</label>
+        <input id="contact-subject" type="text" class="form-input" placeholder="What's it about?">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Message</label>
+        <textarea id="contact-message" class="form-textarea" placeholder="Your message..."></textarea>
+      </div>
+      <button type="button" id="contact-submit-btn" class="btn-primary" style="width:100%;padding:14px" onclick="submitContactMessage()">
+        Send Message →
+      </button>
+      <div id="contact-feedback" style="display:none;margin-top:12px;font-size:14px;padding:12px;border-radius:10px;text-align:center"></div>
     </div>
   </div>
 </section>
 
+<!-- ─── Policies Section — loaded dynamically from API ───────────────────── -->
 <section class="policies-bg" style="padding:70px 20px">
   <div class="section-inner" style="text-align:center;margin-bottom:40px">
     <p class="section-label" style="color:rgba(255,248,243,0.5)">Our Commitments</p>
     <h2 class="section-title" style="color:var(--white)">Shop With <em style="color:var(--peach-soft)">Confidence</em></h2>
   </div>
-  <div class="policies-grid">
-    <div class="policy-card"><span class="policy-icon">🚚</span><h3>Free Shipping</h3><p>On all orders above ₹999. Nationwide delivery across India.</p></div>
-    <div class="policy-card"><span class="policy-icon">🤝</span><h3>100% Handmade</h3><p>Every item is lovingly crafted by hand. No machines, no mass production.</p></div>
-    <div class="policy-card"><span class="policy-icon">🔄</span><h3>Easy Returns</h3><p>Damaged on arrival? Contact us within 24hrs for a replacement or refund.</p></div>
-    <div class="policy-card"><span class="policy-icon">🔒</span><h3>Secure Payments</h3><p>Pay via UPI, Paytm, Google Pay, or bank transfer — safe and instant.</p></div>
-    <div class="policy-card"><span class="policy-icon">✅</span><h3>Quality Checked</h3><p>Every piece is inspected before dispatch. Photos shared for custom orders.</p></div>
-    <div class="policy-card"><span class="policy-icon">💬</span><h3>24hr Support</h3><p>We respond to all Instagram DM and email inquiries within 24 hours.</p></div>
+  <!-- Cards injected here by loadPolicies() -->
+  <div class="policies-grid" id="policies-grid">
+    <!-- Skeleton placeholders while loading -->
+    <div class="policy-card" style="opacity:0.4"><span class="policy-icon">⏳</span><h3>Loading…</h3><p></p></div>
+    <div class="policy-card" style="opacity:0.4"><span class="policy-icon">⏳</span><h3>Loading…</h3><p></p></div>
+    <div class="policy-card" style="opacity:0.4"><span class="policy-icon">⏳</span><h3>Loading…</h3><p></p></div>
   </div>
 </section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -132,6 +160,7 @@
   </div>
   <div class="footer-copy">© 2026 TheYarnJourney. All Rights Reserved. · Made with 🧶 & love in India</div>
 </footer>
+
 <!-- CART PANEL -->
 <div class="overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-panel" id="cart-panel">
@@ -145,6 +174,7 @@
     <button class="btn-primary" style="width:100%;padding:15px" onclick="window.location.href='cart.html'">Go to Cart →</button>
   </div>
 </div>
+
 <!-- PRODUCT MODAL -->
 <div class="product-modal" id="product-modal">
   <div class="modal-overlay" onclick="closeModal()"></div>
@@ -154,7 +184,116 @@
     <div class="modal-details" id="modal-details"></div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
+
+<script src="api.js"></script>
 <script src="script.js"></script>
+<script>
+// ─── Default policies (fallback if API returns nothing) ──────────────────
+var DEFAULT_POLICIES = [
+  { icon: '🚚', title: 'Free Shipping',    body: 'On all orders above Rs.999. Nationwide delivery across India.' },
+  { icon: '🤝', title: '100% Handmade',   body: 'Every item is lovingly crafted by hand. No machines, no mass production.' },
+  { icon: '🔄', title: 'Easy Returns',     body: 'Damaged on arrival? Contact us within 24hrs for a replacement or refund.' },
+  { icon: '🔒', title: 'Secure Payments', body: 'Pay via UPI, Paytm, Google Pay, or bank transfer - safe and instant.' },
+  { icon: '✅', title: 'Quality Checked', body: 'Every piece is inspected before dispatch. Photos shared for custom orders.' },
+  { icon: '💬', title: '24hr Support',    body: 'We respond to all Instagram DM and email inquiries within 24 hours.' },
+];
+
+// Your backend: GET /api/content/policies returns a pageContent doc with shape:
+//   { sections:[{key,title,subtitle,isActive,order}],
+//     policies:{ returnRefundPolicy, shippingPolicy, privacyPolicy, termsOfService } }
+// Priority: sections[] -> policies{} text blocks -> DEFAULT_POLICIES
+async function loadPolicies() {
+  var grid = document.getElementById('policies-grid');
+  if (!grid) return;
+
+  var cards = [];
+
+  try {
+    var data = await fetchJson(API_BASE + '/content/policies');
+
+    // 1. sections[] - admin-editable cards with key/title/subtitle
+    var iconMap = { shipping:'🚚', returns:'🔄', payments:'🔒', quality:'✅', support:'💬', handmade:'🤝' };
+    var sections = (data.sections || []).filter(function(s){ return s.isActive !== false; });
+    if (sections.length) {
+      cards = sections.map(function(s){
+        return { icon: iconMap[s.key] || '✨', title: s.title, body: s.subtitle || '' };
+      });
+    }
+
+    // 2. Fallback: flat policies text fields
+    if (!cards.length && data.policies) {
+      var p = data.policies;
+      if (p.shippingPolicy)     cards.push({ icon:'🚚', title:'Shipping Policy',    body:p.shippingPolicy });
+      if (p.returnRefundPolicy) cards.push({ icon:'🔄', title:'Returns & Refunds',  body:p.returnRefundPolicy });
+      if (p.privacyPolicy)      cards.push({ icon:'🔒', title:'Privacy Policy',     body:p.privacyPolicy });
+      if (p.termsOfService)     cards.push({ icon:'📄', title:'Terms of Service',   body:p.termsOfService });
+    }
+  } catch(e) {
+    // API not reachable - use defaults silently
+  }
+
+  if (!cards.length) cards = DEFAULT_POLICIES;
+
+  grid.innerHTML = cards.map(function(p){
+    return '<div class="policy-card">'
+      + '<span class="policy-icon">' + p.icon + '</span>'
+      + '<h3>' + p.title + '</h3>'
+      + '<p>' + p.body + '</p>'
+      + '</div>';
+  }).join('');
+}
+
+// ─── Contact form submission ──────────────────────────────────────────────
+async function submitContactMessage() {
+  const name    = document.getElementById('contact-name')?.value.trim();
+  const email   = document.getElementById('contact-email')?.value.trim();
+  const subject = document.getElementById('contact-subject')?.value.trim();
+  const message = document.getElementById('contact-message')?.value.trim();
+
+  const feedback = document.getElementById('contact-feedback');
+  const btn      = document.getElementById('contact-submit-btn');
+
+  if (!name || !email || !message) {
+    showFeedback(feedback, '❌ Please fill in your name, email and message.', 'crimson');
+    return;
+  }
+  if (!email.includes('@')) {
+    showFeedback(feedback, '❌ Please enter a valid email address.', 'crimson');
+    return;
+  }
+
+  btn.disabled     = true;
+  btn.textContent  = 'Sending…';
+
+  try {
+    await API.contact.send({ name, email, subject, message });
+    showFeedback(feedback, 'Message sent! We will get back to you within 24 hours.', 'green');
+    ['contact-name', 'contact-email', 'contact-subject', 'contact-message']
+      .forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
+  } catch (err) {
+    showFeedback(feedback, err.message || 'Failed to send. Please try again.', 'crimson');
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Send Message ->';
+  }
+}
+
+function showFeedback(el, msg, color) {
+  if (!el) return;
+  el.style.display          = 'block';
+  el.style.color            = color;
+  el.style.backgroundColor  = color === 'green' ? '#f0fff4' : color === 'crimson' ? '#fff0f0' : '#fff8f0';
+  el.style.border           = `1px solid ${color}`;
+  el.textContent            = msg;
+}
+
+// Run after initApp has set up API_BASE
+document.addEventListener('DOMContentLoaded', () => {
+  // Small delay so initApp() finishes first and API_BASE is ready
+  setTimeout(loadPolicies, 300);
+});
+</script>
 </body>
 </html>

@@ -4,13 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Categories — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="admin-layout">
   <aside class="sidebar" id="sidebar"></aside>
 
   <main class="main-content">
+
     <div class="page-header">
       <div class="page-header-left">
         <h1>Categories</h1>
@@ -21,30 +22,80 @@
       </div>
     </div>
 
-    <!-- Category Grid -->
-    <div id="catGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;"></div>
+    <!-- Stat Cards -->
+    <div class="stat-cards" id="statCards">
+      <div class="stat-card">
+        <div class="stat-icon">🏷️</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Categories</div>
+          <div class="stat-value" id="stat-total">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">👁️</div>
+        <div class="stat-info">
+          <div class="stat-label">Visible</div>
+          <div class="stat-value" id="stat-visible">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🙈</div>
+        <div class="stat-info">
+          <div class="stat-label">Hidden</div>
+          <div class="stat-value" id="stat-hidden">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Products</div>
+          <div class="stat-value" id="stat-products">—</div>
+        </div>
+      </div>
+    </div>
 
+    <!-- Category Cards Grid -->
+    <div id="catGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">
+        Loading categories…
+      </div>
+    </div>
+
+    <!-- Table -->
     <div class="card">
-      <div class="card-header"><span class="card-title">All Categories</span></div>
+      <div class="card-header">
+        <span class="card-title">All Categories</span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="search-box" style="min-width:200px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="catSearch" placeholder="Search categories…" oninput="renderTable()" />
+          </div>
+        </div>
+      </div>
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
               <th>CATEGORY</th>
               <th>PRODUCTS</th>
-              <th>ACTIVE</th>
-              <th>REVENUE</th>
+              <th>STATUS</th>
+              <th>ORDER</th>
               <th>ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="catTbody"></tbody>
+          <tbody id="catTbody">
+            <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
+
   </main>
 </div>
 
-<!-- Add Category Modal -->
+<!-- ══════════════════════════════════
+     ADD CATEGORY MODAL
+══════════════════════════════════ -->
 <div class="modal-overlay" id="addCatModal">
   <div class="modal">
     <div class="modal-header">
@@ -53,74 +104,349 @@
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Category Name</label>
-        <input class="form-input" placeholder="e.g. Flower Bouquets" />
+        <label class="form-label">Category Name <span style="color:var(--red)">*</span></label>
+        <input id="add-name" class="form-input" placeholder="e.g. Flower Bouquets" />
       </div>
       <div class="form-group">
-        <label class="form-label">Icon / Emoji</label>
-        <input class="form-input" placeholder="e.g. 🌸" maxlength="4" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-textarea" placeholder="Brief description of this category…"></textarea>
+        <label class="form-label">Display Order</label>
+        <input id="add-order" class="form-input" type="number" min="0" placeholder="0" />
+        <div class="form-hint">Lower numbers appear first in the store.</div>
       </div>
       <div class="toggle-row">
-        <span style="font-size:13px;font-weight:500;">Visible on Store</span>
-        <button class="toggle on"></button>
+        <div>
+          <div style="font-size:13px;font-weight:500;">Hide on Store</div>
+          <div class="form-hint" style="margin-top:2px;">Hidden categories won't appear to customers.</div>
+        </div>
+        <button id="add-isHidden" class="toggle" onclick="this.classList.toggle('on')"></button>
       </div>
+      <p id="add-error" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"></p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('addCatModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="showToast('Category created! 🏷️','success');closeModal('addCatModal')">Save Category</button>
+      <button class="btn btn-primary" id="add-save-btn" onclick="saveCategory()">Save Category</button>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════════
+     EDIT CATEGORY MODAL
+══════════════════════════════════ -->
+<div class="modal-overlay" id="editCatModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Category</span>
+      <button class="modal-close" onclick="closeModal('editCatModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="edit-id" type="hidden" />
+      <div class="form-group">
+        <label class="form-label">Category Name <span style="color:var(--red)">*</span></label>
+        <input id="edit-name" class="form-input" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Display Order</label>
+        <input id="edit-order" class="form-input" type="number" min="0" />
+        <div class="form-hint">Lower numbers appear first in the store.</div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:13px;font-weight:500;">Hide on Store</div>
+          <div class="form-hint" style="margin-top:2px;">Hidden categories won't appear to customers.</div>
+        </div>
+        <button id="edit-isHidden" class="toggle" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <p id="edit-error" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editCatModal')">Cancel</button>
+      <button class="btn btn-primary" id="edit-save-btn" onclick="updateCategory()">Update Category</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     DELETE CONFIRM MODAL
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deleteCatModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">Delete Category?</span>
+      <button class="modal-close" onclick="closeModal('deleteCatModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text-mid);line-height:1.6;">
+        You're about to delete <strong id="delete-cat-name"></strong>.
+        Products in this category won't be deleted, but they'll lose their category assignment.
+      </p>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('deleteCatModal')">Cancel</button>
+      <button class="btn btn-danger" id="delete-confirm-btn" onclick="executeDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="../api.js"></script>
 <script src="shared.js"></script>
 <script>
-const CATS = [
-  { name:'Flower Bouquets', icon:'💐', products:12, active:10, revenue:19840 },
-  { name:'Single Flowers',  icon:'🌸', products:6,  active:6,  revenue:6230 },
-  { name:'Wreaths',         icon:'🌿', products:5,  active:4,  revenue:8740 },
-  { name:'Gift Sets',       icon:'🎁', products:4,  active:3,  revenue:9610 },
-  { name:'Accessories',     icon:'✂️', products:3,  active:3,  revenue:2190 },
-];
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let categories = [];
+let pendingDeleteId = null;
 
+/* ═══════════════════════════════════
+   BOOT
+═══════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   renderSidebar('categories');
-  initToggles();
-
-  // Category cards
-  const grid = document.getElementById('catGrid');
-  grid.innerHTML = CATS.map(c => `
-    <div class="card" style="padding:20px;display:flex;align-items:center;gap:14px;cursor:pointer;"
-         onclick="showToast('Viewing ${c.name}','info')">
-      <div style="font-size:32px;">${c.icon}</div>
-      <div>
-        <div style="font-weight:600;font-size:14px;">${c.name}</div>
-        <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${c.products} products · ${c.active} active</div>
-        <div style="font-size:12px;color:var(--green);margin-top:2px;">₹${c.revenue.toLocaleString('en-IN')} revenue</div>
-      </div>
-    </div>
-  `).join('');
-
-  // Table
-  const tbody = document.getElementById('catTbody');
-  tbody.innerHTML = CATS.map(c => `
-    <tr>
-      <td><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">${c.icon}</span><span style="font-weight:500;">${c.name}</span></div></td>
-      <td><strong>${c.products}</strong></td>
-      <td><strong>${c.active}</strong></td>
-      <td><strong>₹${c.revenue.toLocaleString('en-IN')}</strong></td>
-      <td>
-        <div class="action-btns">
-          <button class="icon-btn" onclick="showToast('Editing category','info')">✏️</button>
-          <button class="icon-btn danger" onclick="showToast('Category deleted','error')">🗑️</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  fetchCategories();
 });
+
+/* ═══════════════════════════════════
+   FETCH
+   NOTE: update your getAllCategories
+   controller to also .select("products isHidden order")
+   so these fields come through.
+═══════════════════════════════════ */
+async function fetchCategories() {
+  try {
+    const data = await API.categories.getAll()
+    categories = (data.categories || []).map(c => ({
+      ...c,
+      _nameLower: (c.name || '').toLowerCase()
+    }));
+    updateStats();
+    renderCards();
+    renderTable();
+  } catch (err) {
+    showToast('Failed to load categories: ' + err.message, 'error');
+    document.getElementById('catGrid').innerHTML =
+      `<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+    document.getElementById('catTbody').innerHTML =
+      `<tr><td colspan="5" class="empty-state">Failed to load. Check console.</td></tr>`;
+  }
+}
+
+/* ═══════════════════════════════════
+   STATS
+═══════════════════════════════════ */
+function updateStats() {
+  const visible  = categories.filter(c => !c.isHidden).length;
+  const hidden   = categories.filter(c =>  c.isHidden).length;
+  const products = categories.reduce((sum, c) => sum + (Array.isArray(c.products) ? c.products.length : 0), 0);
+
+  document.getElementById('stat-total').textContent    = categories.length;
+  document.getElementById('stat-visible').textContent  = visible;
+  document.getElementById('stat-hidden').textContent   = hidden;
+  document.getElementById('stat-products').textContent = products;
+}
+
+/* ═══════════════════════════════════
+   CARDS
+═══════════════════════════════════ */
+function renderCards() {
+  const grid = document.getElementById('catGrid');
+  if (!categories.length) {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;" class="empty-state">
+        <div class="empty-icon">🏷️</div>
+        <h3>No categories yet</h3>
+        <p>Click <strong>+ Add Category</strong> to create your first one.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = categories.map(c => {
+    const count = Array.isArray(c.products) ? c.products.length : 0;
+    const hiddenBadge = c.isHidden
+      ? `<span class="badge badge-gray" style="font-size:10px;padding:1px 6px;margin-left:6px;">Hidden</span>`
+      : '';
+    return `
+      <div class="card" style="padding:18px;display:flex;align-items:center;gap:14px;cursor:pointer;opacity:${c.isHidden ? '.55' : '1'};transition:box-shadow .15s,transform .15s;"
+           onmouseenter="this.style.boxShadow='var(--shadow-md)';this.style.transform='translateY(-2px)'"
+           onmouseleave="this.style.boxShadow='';this.style.transform=''"
+           onclick="openEditModal('${c._id}')">
+        <div style="font-size:30px;flex-shrink:0;">🏷️</div>
+        <div style="min-width:0;">
+          <div style="font-weight:600;font-size:13.5px;display:flex;align-items:center;flex-wrap:wrap;">
+            ${esc(c.name)}${hiddenBadge}
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+            ${count} product${count !== 1 ? 's' : ''}
+          </div>
+          ${c.order !== undefined && c.order !== null
+            ? `<div style="font-size:11px;color:var(--accent);margin-top:2px;">Order #${c.order}</div>`
+            : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   TABLE
+═══════════════════════════════════ */
+function renderTable() {
+  const q = (document.getElementById('catSearch')?.value || '').toLowerCase();
+  const filtered = categories.filter(c => (c._nameLower || '').includes(q));
+  const tbody = document.getElementById('catTbody');
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No categories match your search.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(c => {
+    const count = Array.isArray(c.products) ? c.products.length : '—';
+    const statusBadge = c.isHidden
+      ? `<span class="badge badge-gray">Hidden</span>`
+      : `<span class="badge badge-green">Visible</span>`;
+
+    return `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">🏷️</span>
+            <span style="font-weight:500;">${esc(c.name)}</span>
+          </div>
+        </td>
+        <td><strong>${count}</strong></td>
+        <td>${statusBadge}</td>
+        <td>${c.order ?? '—'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="icon-btn" title="Edit" onclick="openEditModal('${c._id}')">✏️</button>
+            <button class="icon-btn danger" title="Delete" onclick="openDeleteModal('${c._id}', '${esc(c.name)}')">🗑️</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   ADD
+═══════════════════════════════════ */
+function openAddModal() {
+  document.getElementById('add-name').value  = '';
+  document.getElementById('add-order').value = '';
+  document.getElementById('add-isHidden').classList.remove('on');
+  hideErr('add-error');
+  openModal('addCatModal');
+}
+
+async function saveCategory() {
+  const name     = document.getElementById('add-name').value.trim();
+  const order    = document.getElementById('add-order').value;
+  const isHidden = document.getElementById('add-isHidden').classList.contains('on');
+
+  if (!name) { showErr('add-error', 'Category name is required.'); return; }
+
+  const btn = document.getElementById('add-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+
+    const data = await API.admin.create({ name, isHidden, order: order !== '' ? Number(order) : undefined });
+    categories.push(data.category);
+    updateStats(); renderCards(); renderTable();
+    closeModal('addCatModal');
+    showToast(`"${name}" created! 🏷️`, 'success');
+  } catch (err) {
+    showErr('add-error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Category';
+  }
+}
+
+/* ═══════════════════════════════════
+   EDIT
+═══════════════════════════════════ */
+function openEditModal(catId) {
+  const cat = categories.find(c => c._id === catId);
+  if (!cat) return;
+
+  document.getElementById('edit-id').value    = cat._id;
+  document.getElementById('edit-name').value  = cat.name;
+  document.getElementById('edit-order').value = cat.order ?? '';
+  document.getElementById('edit-isHidden').classList.toggle('on', !!cat.isHidden);
+  hideErr('edit-error');
+  openModal('editCatModal');
+}
+
+async function updateCategory() {
+  const categoryId = document.getElementById('edit-id').value;
+  const name       = document.getElementById('edit-name').value.trim();
+  const order      = document.getElementById('edit-order').value;
+  const isHidden   = document.getElementById('edit-isHidden').classList.contains('on');
+
+  if (!name) { showErr('edit-error', 'Category name is required.'); return; }
+
+  const btn = document.getElementById('edit-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+
+    const data = await API.admin.update({ categoryId, name, isHidden, order: order !== '' ? Number(order) : undefined });
+    const idx = categories.findIndex(c => c._id === categoryId);
+    if (idx !== -1) categories[idx] = { ...categories[idx], ...data.category, _id: categoryId };
+    updateStats(); renderCards(); renderTable();
+    closeModal('editCatModal');
+    showToast(`"${name}" updated!`, 'success');
+  } catch (err) {
+    showErr('edit-error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Update Category';
+  }
+}
+
+/* ═══════════════════════════════════
+   DELETE
+═══════════════════════════════════ */
+function openDeleteModal(catId, catName) {
+  pendingDeleteId = catId;
+  document.getElementById('delete-cat-name').textContent = catName;
+  openModal('deleteCatModal');
+}
+
+async function executeDelete() {
+  if (!pendingDeleteId) return;
+  const catId = pendingDeleteId;
+
+  const btn = document.getElementById('delete-confirm-btn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+
+  try {
+
+    await API.admin.delete(catId);
+    categories = categories.filter(c => c._id !== catId);
+    updateStats(); renderCards(); renderTable();
+    closeModal('deleteCatModal');
+    showToast('Category deleted.', 'error');
+  } catch (err) {
+    showToast('Delete failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Yes, Delete';
+    pendingDeleteId = null;
+  }
+}
+
+/* ═══════════════════════════════════
+   TINY HELPERS
+═══════════════════════════════════ */
+function esc(str = '') {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideErr(id) {
+  const el = document.getElementById(id);
+  el.textContent = ''; el.style.display = 'none';
+}
 </script>
 </body>
 </html>

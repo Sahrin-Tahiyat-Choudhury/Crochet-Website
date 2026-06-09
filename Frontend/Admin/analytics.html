@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analytics — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
   <style>
     .chart-bar-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
     .chart-bar-label { width:120px; font-size:12.5px; color:var(--text-mid); text-align:right; flex-shrink:0; }
@@ -34,35 +34,54 @@
         <p>Store performance overview · May 2026</p>
       </div>
       <div class="page-header-actions">
-        <select class="filter-select">
-          <option>This Month</option>
-          <option>Last Month</option>
-          <option>Last 3 Months</option>
-          <option>This Year</option>
-        </select>
-        <button class="btn btn-outline" onclick="showToast('Report exported','info')">📤 Export</button>
+        <select class="filter-select" onchange="loadAnalytics(this.value)">
+  <option value="this_month">This Month</option>
+  <option value="last_month">Last Month</option>
+  <option value="last_3_months">Last 3 Months</option>
+  <option value="this_year">This Year</option>
+</select>
+        <button class="btn btn-outline" onclick="exportAnalytics()">📤 Export</button>
       </div>
     </div>
 
     <!-- KPI Cards -->
-    <div class="stat-cards">
-      <div class="stat-card">
-        <div class="stat-icon">💰</div>
-        <div class="stat-info"><div class="stat-label">Revenue</div><div class="stat-value">₹42,180</div><div class="stat-sub">↑ 8.2% vs last month</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🛒</div>
-        <div class="stat-info"><div class="stat-label">Orders</div><div class="stat-value">148</div><div class="stat-sub">↑ 12 this month</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-info"><div class="stat-label">Avg Order Value</div><div class="stat-value">₹285</div><div class="stat-sub">↑ ₹22 vs last month</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-info"><div class="stat-label">New Customers</div><div class="stat-value">34</div><div class="stat-sub">↑ 5 this month</div></div>
-      </div>
-    </div>
+     <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px;">
+    <div class="stat-card">
+  <div class="stat-icon">💰</div>
+  <div class="stat-info">
+    <div class="stat-label">Revenue</div>
+    <div class="stat-value" id="revenueValue">₹0</div>
+    <div class="stat-sub" id="revenueSub"></div>
+  </div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-icon">🛒</div>
+  <div class="stat-info">
+    <div class="stat-label">Orders</div>
+    <div class="stat-value" id="ordersValue">0</div>
+    <div class="stat-sub" id="ordersSub"></div>
+  </div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-icon">📊</div>
+  <div class="stat-info">
+    <div class="stat-label">Avg Order Value</div>
+    <div class="stat-value" id="avgOrderValue">₹0</div>
+    <div class="stat-sub" id="avgOrderSub"></div>
+  </div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-icon">👥</div>
+  <div class="stat-info">
+    <div class="stat-label">Customers</div>
+    <div class="stat-value" id="customersValue">0</div>
+    <div class="stat-sub" id="customersSub"></div>
+  </div>
+</div>
+</div>
 
     <div class="analytics-grid">
       <!-- Revenue by Category -->
@@ -97,92 +116,17 @@
 
     <!-- Order Timeline -->
     <div class="card">
-      <div class="card-header"><span class="card-title">Daily Orders — May 2026</span></div>
-      <div class="card-body">
-        <div style="display:flex;align-items:flex-end;gap:3px;height:80px;" id="dailyChart"></div>
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:8px;">
-          <span>1 May</span><span>7 May</span><span>14 May</span><span>21 May</span><span>27 May</span>
-        </div>
-      </div>
-    </div>
+  <div class="card-header"><span class="card-title" id="dailyOrdersTitle">Daily Orders</span></div>
+  <div class="card-body">
+    <div style="display:flex;align-items:flex-end;gap:3px;height:80px;" id="dailyChart"></div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:8px;" id="dailyLabels"></div>
+  </div>
+</div>
   </main>
 </div>
 
+<script src="../api.js"></script>
 <script src="shared.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  renderSidebar('analytics');
-
-  // Category bar chart
-  const cats = [
-    { name:'Flower Bouquets', val:19840, pct:47 },
-    { name:'Gift Sets',       val:9610,  pct:23 },
-    { name:'Wreaths',         val:8740,  pct:21 },
-    { name:'Single Flowers',  val:6230,  pct:15 },
-    { name:'Accessories',     val:2190,  pct:5  },
-  ];
-  const barColors = ['var(--accent)','#4a7fc1','#4caf82','#9370DB','#e6a817'];
-  document.getElementById('categoryChart').innerHTML = cats.map((c,i) => `
-    <div class="chart-bar-row">
-      <div class="chart-bar-label">${c.name}</div>
-      <div class="chart-bar-track">
-        <div class="chart-bar-fill" style="width:${c.pct}%;background:${barColors[i]};">₹${(c.val/1000).toFixed(1)}k</div>
-      </div>
-      <div class="chart-bar-value">₹${(c.val/1000).toFixed(1)}k</div>
-    </div>`).join('');
-
-  // Monthly trend
-  const months = ['Dec','Jan','Feb','Mar','Apr','May'];
-  const mVals  = [28000,32000,35000,38000,39000,42180];
-  const maxM = Math.max(...mVals);
-  document.getElementById('monthChart').innerHTML = mVals.map((v,i) => {
-    const h = Math.round((v/maxM)*100);
-    return `<div title="₹${v.toLocaleString('en-IN')}" style="flex:1;height:${h}%;background:var(--accent);opacity:${0.5+i*0.1};border-radius:4px 4px 0 0;"></div>`;
-  }).join('');
-  document.getElementById('monthLabels').innerHTML = months.map(m=>`<span>${m}</span>`).join('');
-
-  // Top products
-  const top = [
-    { name:'Sunflower Bouquet', rev:'₹8,490', orders:10 },
-    { name:'Lavender Wreath',   rev:'₹7,194', orders:6  },
-    { name:'Daisy Gift Set',    rev:'₹5,996', orders:4  },
-    { name:'Rose Bunch (Pink)', rev:'₹5,592', orders:8  },
-    { name:"Baby's Breath Set", rev:'₹5,397', orders:3  },
-  ];
-  document.getElementById('topProducts').innerHTML = top.map((p,i) => `
-    <li>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div class="top-rank">${i+1}</div>
-        <div>
-          <div style="font-weight:500;">${p.name}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${p.orders} orders</div>
-        </div>
-      </div>
-      <strong>${p.rev}</strong>
-    </li>`).join('');
-
-  // City chart
-  const cities = [
-    { name:'Mumbai',    pct:28 }, { name:'Bangalore', pct:22 },
-    { name:'Hyderabad', pct:18 }, { name:'Delhi',     pct:14 },
-    { name:'Chennai',   pct:10 }, { name:'Other',     pct:8  },
-  ];
-  document.getElementById('cityChart').innerHTML = cities.map((c,i)=>`
-    <div class="chart-bar-row">
-      <div class="chart-bar-label">${c.name}</div>
-      <div class="chart-bar-track">
-        <div class="chart-bar-fill" style="width:${c.pct}%;background:${barColors[i]||'var(--blue)'};">${c.pct}%</div>
-      </div>
-      <div class="chart-bar-value">${c.pct}%</div>
-    </div>`).join('');
-
-  // Daily orders
-  const daily = [2,1,3,2,4,3,5,2,1,3,4,2,3,5,4,3,6,4,2,5,3,4,2,5,4,3,5];
-  const maxD = Math.max(...daily);
-  document.getElementById('dailyChart').innerHTML = daily.map((v,i)=>`
-    <div title="Day ${i+1}: ${v} orders" style="flex:1;height:${Math.round((v/maxD)*100)}%;background:var(--accent);opacity:0.7;border-radius:2px 2px 0 0;cursor:pointer;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=.7"></div>
-  `).join('');
-});
-</script>
+<script src="analytics.js"></script>
 </body>
 </html>

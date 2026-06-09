@@ -9,9 +9,10 @@ const upload = multer({
 
 const router = express.Router();
 
+const csv = require('csv-parser');
 /*
 Create - a product, a category
-(Admin only)
+(Admin only)z
 
 */
 router.post('/upload', authMiddleware.authAdmin, upload.single("image"), productController.createProduct);
@@ -32,15 +33,12 @@ router.delete("/delete-product/:productId", authMiddleware.authAdmin, productCon
 /*
 View all products and all categories 
 */
-router.get("/",authMiddleware.authUserAndAdmin, productController.getAllProducts)
-router.get("/products/:productId",authMiddleware.authUserAndAdmin, productController.getProductById)
-router.get("/search",authMiddleware.authUserAndAdmin,productController.filterAndSortProducts)
-router.get("/", authMiddleware.authUserAndAdmin, productController.filterAndSortProducts);
+router.get("/", productController.getAllProducts)
+router.get("/products/:productId", productController.getProductById)
+router.get("/search", productController.filterAndSortProducts);
 
-
-router.get("/categories",authMiddleware.authUserAndAdmin, productController.getAllCategories)
-router.get("/categories/:categoryId",authMiddleware.authUserAndAdmin, productController.getCategoryById)
-router.get("/search",authMiddleware.authUserAndAdmin,productController.filterAndSortProducts)
+router.get("/categories", productController.getAllCategories)
+router.get("/categories/:categoryId", productController.getCategoryById)
 
 /**
 - Edit category ( includes show/hide category, Arrange category order)
@@ -49,5 +47,7 @@ router.get("/search",authMiddleware.authUserAndAdmin,productController.filterAnd
 router.patch("/edit-category", authMiddleware.authAdmin, productController.editCategory)
 router.delete("/delete-category/:categoryId", authMiddleware.authAdmin, productController.deleteCategory)
 
+
+router.post('/import',authMiddleware.authAdmin,upload.single('csv'),productController.importProducts);
 
 module.exports = router;

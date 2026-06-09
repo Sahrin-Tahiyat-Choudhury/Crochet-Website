@@ -8,5 +8,8 @@ router.post('/product/:productId',authMiddleware.authUserAndAdmin, reviewControl
 router.patch('/:reviewId',authMiddleware.authUserAndAdmin, reviewController.editReview);
 router.patch('/:reviewId/respond',authMiddleware.authAdmin, reviewController.respondToReview);
 router.delete('/:reviewId',authMiddleware.authUserAndAdmin, reviewController.deleteReview);
+router.get('/', reviewController.getAllReviews);
 
+router.get('/product/:productId',reviewController.getProductReviews
+);
 module.exports = router;

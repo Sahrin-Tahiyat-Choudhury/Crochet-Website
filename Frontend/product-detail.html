@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product | The Yarn Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── DETAIL PAGE ONLY ── */
+    .pd-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* breadcrumb */
+    .pd-breadcrumb {
+      font-size: .82rem;
+      color: var(--brown-light);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pd-breadcrumb a { color: var(--brown-light); text-decoration: none; }
+    .pd-breadcrumb a:hover { color: var(--brown); }
+
+    /* grid */
+    .pd-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: start;
+    }
+    @media(max-width:760px){ .pd-grid { grid-template-columns:1fr; gap:32px; } }
+
+    /* image */
+    .pd-img-wrap {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--blush, #fdf0f0);
+      aspect-ratio: 1;
+      box-shadow: 0 8px 40px rgba(180,120,100,.13);
+    }
+    .pd-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .5s ease;
+    }
+    .pd-img-wrap:hover img { transform: scale(1.04); }
+    .pd-img-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 100px;
+      background: var(--blush-mid, #f9e4e4);
+    }
+    .pd-badge {
+      position: absolute;
+      top: 14px; left: 14px;
+      background: var(--peach, #e8927c);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 50px;
+    }
+
+    /* colors row */
+    .pd-colors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .pd-color-chip {
+      font-size: .78rem;
+      background: var(--blush, #fdf0f0);
+      color: var(--brown);
+      border: 1px solid var(--blush-mid, #f9e4e4);
+      border-radius: 50px;
+      padding: 4px 12px;
+    }
+
+    /* info panel */
+    .pd-info { display: flex; flex-direction: column; gap: 18px; }
+
+    .pd-cat {
+      font-size: .78rem;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--peach, #e8927c);
+    }
+
+    .pd-name {
+      font-family: var(--font-display, 'Cormorant Garamond', serif);
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 600;
+      line-height: 1.15;
+      color: var(--dark, #2d1f1f);
+    }
+
+    .pd-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .pd-sell {
+      font-family: var(--font-display, 'Cormorant Garamond', serif);
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--dark, #2d1f1f);
+    }
+    .pd-mrp {
+      font-size: 1.05rem;
+      color: var(--brown-light, #b07070);
+      text-decoration: line-through;
+    }
+    .pd-disc {
+      font-size: .8rem;
+      font-weight: 600;
+      background: var(--blush, #fdf0f0);
+      color: var(--peach, #e8927c);
+      padding: 3px 10px;
+      border-radius: 50px;
+    }
+
+    .pd-divider {
+      border: none;
+      border-top: 1px solid var(--blush-mid, #f9e4e4);
+    }
+
+    .pd-desc {
+      font-size: .97rem;
+      line-height: 1.8;
+      color: var(--brown, #7a4f4f);
+    }
+
+    /* stock pill */
+    .pd-stock {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .82rem;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 50px;
+    }
+    .pd-stock.in  { background: #f0faf4; color: #2e7d52; }
+    .pd-stock.low { background: #fff8ec; color: #b45309; }
+    .pd-stock.out { background: #fef2f2; color: #b91c1c; }
+
+    /* qty */
+    .pd-qty-label { font-size: .83rem; font-weight: 500; color: var(--brown-light); margin-bottom: 8px; }
+    .pd-qty-row { display: flex; align-items: center; }
+    .pd-qty-btn {
+      width: 40px; height: 40px;
+      border: 1.5px solid var(--blush-mid, #f9e4e4);
+      background: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--dark);
+      transition: background .15s;
+    }
+    .pd-qty-btn:first-child { border-radius: 10px 0 0 10px; }
+    .pd-qty-btn:last-child  { border-radius: 0 10px 10px 0; }
+    .pd-qty-btn:hover { background: var(--blush, #fdf0f0); }
+    #pd-qty {
+      width: 52px; height: 40px;
+      border: 1.5px solid var(--blush-mid, #f9e4e4);
+      border-left: none; border-right: none;
+      text-align: center;
+      font-size: .97rem; font-weight: 500;
+      background: #fff;
+      color: var(--dark);
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+    #pd-qty::-webkit-outer-spin-button,
+    #pd-qty::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    /* actions */
+    .pd-actions { display: flex; flex-direction: column; gap: 12px; }
+
+    /* meta pills */
+    .pd-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px,1fr));
+      gap: 10px;
+    }
+    .pd-meta-pill {
+      background: var(--blush, #fdf0f0);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: .8rem;
+    }
+    .pd-meta-pill .pill-label { display: block; color: var(--brown-light); margin-bottom: 2px; font-size: .74rem; }
+    .pd-meta-pill .pill-val   { font-weight: 600; color: var(--dark); }
+
+    /* tabs */
+    .pd-tabs { margin-top: 48px; border-top: 1px solid var(--blush-mid, #f9e4e4); padding-top: 40px; }
+    .pd-tab-nav { display: flex; border-bottom: 1px solid var(--blush-mid, #f9e4e4); margin-bottom: 28px; }
+    .pd-tab-btn {
+      padding: 11px 22px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--brown-light);
+      margin-bottom: -1px;
+      transition: color .2s;
+    }
+    .pd-tab-btn.active { color: var(--dark); border-bottom-color: var(--peach, #e8927c); }
+    .pd-tab-panel { display: none; font-size: .95rem; line-height: 1.8; color: var(--brown); }
+    .pd-tab-panel.active { display: block; animation: pdFade .3s ease; }
+    .pd-tab-panel ul { padding-left: 1.2em; }
+    .pd-tab-panel li { margin-bottom: 5px; }
+
+    /* state screens */
+    #pd-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 55vh;
+      gap: 16px;
+      color: var(--brown-light);
+      text-align: center;
+    }
+    .pd-spinner {
+      width: 38px; height: 38px;
+      border: 3px solid var(--blush-mid, #f9e4e4);
+      border-top-color: var(--peach, #e8927c);
+      border-radius: 50%;
+      animation: pdSpin .8s linear infinite;
+    }
+    #pd-state a { color: var(--peach); font-weight:500; text-decoration:none; }
+    #pd-state p { font-size: 1rem; color: var(--brown); }
+
+    @keyframes pdSpin { to { transform: rotate(360deg); } }
+    @keyframes pdFade { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    #pd-content { display: none; animation: pdFade .4s ease; }
+  </style>
+</head>
+<body>
+
+<!-- NAV (matches your site exactly) -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo-wrap">
+      <div class="logo-text">🧶 TheYARN<em style="color:var(--brown);font-style:italic">Journey</em></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="home.html">Shop</a></li>
+      <li><a href="product.html">Products</a></li>
+      <li><a href="cart.html">Cart</a></li>
+      <li><a href="orders.html">My Orders</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
+    </ul>
+    <div class="nav-icons">
+      <button class="nav-icon-btn" onclick="toggleSearch()" title="Search">🔍</button>
+      <button class="nav-icon-btn" onclick="toggleCart()" title="Cart">
+        🛒
+        <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+      <button class="hamburger" onclick="toggleMobileNav()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-overlay" id="mobile-overlay" onclick="toggleMobileNav()"></div>
+<div class="mobile-nav" id="mobile-nav">
+  <button class="close-mobile" onclick="toggleMobileNav()">✕</button>
+  <ul>
+    <li><a href="index.html" onclick="toggleMobileNav()">Home</a></li>
+    <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
+    <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
+    <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="orders.html" onclick="toggleMobileNav()">My Orders</a></li>
+    <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
+    <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
+  </ul>
+</div>
+
+<!-- MAIN -->
+<div class="pd-wrap">
+
+  <!-- Loading / Error -->
+  <div id="pd-state">
+    <div class="pd-spinner"></div>
+    <p>Fetching product…</p>
+  </div>
+
+  <!-- Product (shown after load) -->
+  <div id="pd-content">
+
+    <!-- Breadcrumb -->
+    <div class="pd-breadcrumb">
+      <a href="index.html">Home</a> ›
+      <a href="home.html">Shop</a> ›
+      <span id="pd-breadcrumb-name">Product</span>
+    </div>
+
+    <div class="pd-grid">
+
+      <!-- IMAGE -->
+      <div>
+        <div class="pd-img-wrap">
+          <span class="pd-badge" id="pd-badge" style="display:none"></span>
+          <div id="pd-img-inner">
+            <div class="pd-img-placeholder">🧶</div>
+          </div>
+        </div>
+
+        <!-- Color chips -->
+        <div class="pd-colors" id="pd-colors"></div>
+      </div>
+
+      <!-- INFO -->
+      <div class="pd-info">
+        <div class="pd-cat" id="pd-cat"></div>
+        <h1 class="pd-name" id="pd-name"></h1>
+
+        <div class="pd-price-row">
+          <span class="pd-sell" id="pd-sell"></span>
+          <span class="pd-mrp" id="pd-mrp" style="display:none"></span>
+          <span class="pd-disc" id="pd-disc" style="display:none"></span>
+        </div>
+
+        <hr class="pd-divider"/>
+
+        <p class="pd-desc" id="pd-desc"></p>
+
+        <!-- Stock -->
+        <div id="pd-stock-wrap"></div>
+
+        <hr class="pd-divider"/>
+
+        <!-- Qty -->
+        <div>
+          <div class="pd-qty-label">Quantity</div>
+          <div class="pd-qty-row">
+            <button class="pd-qty-btn" onclick="pdChangeQty(-1)">−</button>
+            <input id="pd-qty" type="number" value="1" min="1" readonly/>
+            <button class="pd-qty-btn" onclick="pdChangeQty(1)">+</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="pd-actions">
+          <button class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="pdAddToCart()">
+            Add to Cart 🛒
+          </button>
+          <button class="btn-outline" style="width:100%;padding:14px" onclick="showToast('♡ Added to wishlist!')">
+            Add to Wishlist ♡
+          </button>
+        </div>
+
+        <!-- Meta -->
+        <div class="pd-meta" id="pd-meta"></div>
+      </div>
+    </div><!-- /pd-grid -->
+
+    <!-- TABS -->
+    <div class="pd-tabs">
+      <div class="pd-tab-nav">
+        <button class="pd-tab-btn active" onclick="pdSwitchTab('care', this)">Care Instructions</button>
+        <button class="pd-tab-btn" onclick="pdSwitchTab('shipping', this)">Shipping</button>
+        <button class="pd-tab-btn" onclick="pdSwitchTab('policy', this)">Return Policy</button>
+      </div>
+      <div id="pd-tab-care" class="pd-tab-panel active">
+        <p id="pd-care-text">Details will appear here.</p>
+      </div>
+      <div id="pd-tab-shipping" class="pd-tab-panel">
+        <ul>
+          <li>Every product is handmade — allow 3–14 days processing after payment confirmation.</li>
+          <li>Once dispatched: 5–13 days depending on your location.</li>
+          <li>You will receive a Tracking ID and courier details once shipped.</li>
+          <li>Address changes allowed only within 24 hours of placing the order.</li>
+          <li>Missing packages must be reported within 48 hours of marked delivery.</li>
+        </ul>
+      </div>
+      <div id="pd-tab-policy" class="pd-tab-panel">
+        <ul>
+          <li>All orders are final once confirmed and processed — no returns or exchanges.</li>
+          <li>Refunds are eligible only for items damaged during transit or incorrect orders received.</li>
+          <li>An unboxing video (continuous, uncut) is <strong>mandatory proof</strong> — share within 24 hours via WhatsApp or Instagram DM.</li>
+          <li>Resolution: replacement or store credit, depending on availability.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /pd-content -->
+</div><!-- /pd-wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="fb-name">🧶 The Yarn Journey</div>
+      <p>Handcrafted crochet creations made with love, care, and a whole lot of yarn. Based in Guwahati, Assam, shipping happiness across India.</p>
+      <div class="social-links">
+        <a href="https://www.instagram.com/theyarnjourney" class="social-btn" target="_blank">📸</a>
+        <a href="https://www.facebook.com/share/18hX2TecDq/" class="social-btn" target="_blank">👍</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <ul>
+        <li><a href="home.html">Bouquets</a></li>
+        <li><a href="home.html">Mini Bouquets</a></li>
+        <li><a href="home.html">Keychains</a></li>
+        <li><a href="home.html">Home Decor</a></li>
+        <li><a href="product.html">Make Your Own</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <ul>
+        <li><a href="about.html#faq">FAQs</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a href="product.html">Custom Orders</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Policies</h4>
+      <ul>
+        <li><a href="contact.html">Shipping Policy</a></li>
+        <li><a href="contact.html">Return Policy</a></li>
+        <li><a href="contact.html">Privacy Policy</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-copy">© 2026 TheYarnJourney. All Rights Reserved. · Made with 🧶 & love in India</div>
+</footer>
+
+<!-- CART PANEL -->
+<div class="overlay" id="cart-overlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3>Your Cart 🛒</h3>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-wrap"></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cart-total">₹0.00</span></div>
+    <button class="btn-primary" style="width:100%;padding:15px" onclick="window.location.href='cart.html'">Go to Cart →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Use the same script.js as every other page — it has fetchJson, API_BASE, addToCart, etc. -->
+<script src="script.js"></script>
+<script>
+  // ── Product-detail-specific logic ──────────────────────────────────
+  let pdQty = 1;
+  let pdProductId = null;
+
+  function pdChangeQty(delta) {
+    pdQty = Math.max(1, pdQty + delta);
+    document.getElementById('pd-qty').value = pdQty;
+  }
+
+  function pdAddToCart() {
+    if (!pdProductId) return;
+    addToCart(pdProductId, pdQty);   // addToCart() lives in script.js
+  }
+
+  function pdSwitchTab(name, btn) {
+    document.querySelectorAll('.pd-tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.pd-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('pd-tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function renderProduct(p) {
+    // ── field mapping from your backend ──
+    // p._id, p.name, p.uri, p.description, p.price.originalPrice,
+    // p.price.sellingPrice, p.category.name, p.material,
+    // p.careInstructions, p.colors[], p.stockQuantity, p.isFeatured
+
+    pdProductId = p._id || p.id;
+
+    // Breadcrumb & title
+    const name = p.name || 'Product';
+    document.getElementById('pd-breadcrumb-name').textContent = name;
+    document.title = `${name} | The Yarn Journey`;
+
+    // Category
+    document.getElementById('pd-cat').textContent =
+      p.category?.name || p.category || '';
+
+    // Name
+    document.getElementById('pd-name').textContent = name;
+
+    // Price
+    const sell = p.price?.sellingPrice ?? 0;
+    const orig = p.price?.originalPrice ?? 0;
+    document.getElementById('pd-sell').textContent = `₹${sell}`;
+    if (orig && orig > sell) {
+      const disc = Math.round(((orig - sell) / orig) * 100);
+      document.getElementById('pd-mrp').textContent  = `₹${orig}`;
+      document.getElementById('pd-mrp').style.display  = 'inline';
+      document.getElementById('pd-disc').textContent = `${disc}% Off`;
+      document.getElementById('pd-disc').style.display = 'inline-block';
+    }
+
+    // Featured badge
+    if (p.isFeatured) {
+      const badge = document.getElementById('pd-badge');
+      badge.textContent = '⭐ Featured';
+      badge.style.display = 'inline-block';
+    }
+
+    // Image
+    const imgInner = document.getElementById('pd-img-inner');
+    if (p.uri) {
+      imgInner.innerHTML = `<img src="${p.uri}" alt="${name}"/>`;
+    } else {
+      imgInner.innerHTML = `<div class="pd-img-placeholder">🧶</div>`;
+    }
+
+    // Description
+    document.getElementById('pd-desc').textContent =
+      p.description || 'No description available.';
+
+    // Colors
+    const colorsWrap = document.getElementById('pd-colors');
+    if (Array.isArray(p.colors) && p.colors.length) {
+      colorsWrap.innerHTML = p.colors
+        .map(c => `<span class="pd-color-chip">${c}</span>`)
+        .join('');
+    }
+
+    // Stock
+    const stock = p.stockQuantity ?? null;
+    const stockWrap = document.getElementById('pd-stock-wrap');
+    if (stock !== null) {
+      let cls = 'in', label = `✓ In stock (${stock} available)`;
+      if (stock === 0)  { cls = 'out'; label = '✕ Out of stock'; }
+      else if (stock <= 5) { cls = 'low'; label = `⚠ Only ${stock} left`; }
+      stockWrap.innerHTML = `<span class="pd-stock ${cls}">${label}</span>`;
+    }
+
+    // Care instructions tab
+    document.getElementById('pd-care-text').textContent =
+      p.careInstructions || p.material || 'Dust gently to clean. Keep away from moisture.';
+
+    // Meta pills
+    const metaEl = document.getElementById('pd-meta');
+    const metaItems = [
+      { label: 'Material',   val: p.material },
+      { label: 'Stock',      val: stock !== null ? `${stock} units` : null },
+      { label: 'Category',   val: p.category?.name || p.category },
+      { label: 'SKU',        val: typeof pdProductId === 'string' ? pdProductId.slice(-8).toUpperCase() : null },
+    ];
+    metaEl.innerHTML = metaItems
+      .filter(m => m.val)
+      .map(m => `
+        <div class="pd-meta-pill">
+          <span class="pill-label">${m.label}</span>
+          <span class="pill-val">${m.val}</span>
+        </div>`)
+      .join('');
+
+    // Show content, hide spinner
+    document.getElementById('pd-state').style.display   = 'none';
+    document.getElementById('pd-content').style.display = 'block';
+  }
+
+  async function loadProduct() {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) {
+      document.getElementById('pd-state').innerHTML = `
+        <p>⚠️ No product ID in URL.</p>
+        <a href="home.html">← Back to Shop</a>`;
+      return;
+    }
+
+    try {
+      // Uses fetchJson + API_BASE defined in script.js
+      // Endpoint matches your backend: GET /api/product/products/:id
+      const data = await fetchJson(`${API_BASE}/product/products/${id}`);
+      renderProduct(data.product);
+    } catch (err) {
+      console.error(err);
+      document.getElementById('pd-state').innerHTML = `
+        <p>⚠️ Could not load product — ${err.message}</p>
+        <a href="home.html">← Back to Shop</a>`;
+    }
+  }
+
+  // script.js calls initApp() on DOMContentLoaded which sets up auth + cart.
+  // We hook into that same event to load the product after script.js has run.
+  window.addEventListener('DOMContentLoaded', loadProduct);
+</script>
+</body>
+</html>

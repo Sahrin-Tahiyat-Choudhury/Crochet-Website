@@ -19,7 +19,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
-    }
+    },
+    phone: { type: String, default: "" },
+    city: { type: String, default: "" },
+    photo: { type: String, default: "" }
 })
 
 const userModel = mongoose.model('user', userSchema);

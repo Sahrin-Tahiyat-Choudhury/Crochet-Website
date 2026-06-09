@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Customers — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="admin-layout">
@@ -17,7 +17,7 @@
         <p>View and manage your customer base</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-outline" onclick="showToast('Exporting customer data…','info')">📤 Export</button>
+        <button class="btn btn-outline" onclick="exportCustomers()">📤 Export</button>
       </div>
     </div>
 
@@ -26,31 +26,32 @@
         <div class="stat-icon">👥</div>
         <div class="stat-info">
           <div class="stat-label">Total Customers</div>
-          <div class="stat-value">86</div>
-          <div class="stat-sub">↑ 5 this month</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-sub">↑ this month</div>
         </div>
       </div>
+
       <div class="stat-card">
         <div class="stat-icon">🔁</div>
         <div class="stat-info">
           <div class="stat-label">Repeat Buyers</div>
-          <div class="stat-value">34</div>
-          <div class="stat-sub">39.5% retention</div>
+          <div class="stat-value" id="statRepeat">0</div>
+          <div class="stat-sub" id="statRetention">0% retention</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">⭐</div>
         <div class="stat-info">
           <div class="stat-label">Top Spender</div>
-          <div class="stat-value">₹8.4k</div>
-          <div class="stat-sub neutral">Priya Sharma</div>
+          <div class="stat-value" id="statTopSpender">₹0</div>
+          <div class="stat-sub neutral" id="statTopName">—</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📍</div>
         <div class="stat-info">
           <div class="stat-label">Cities Reached</div>
-          <div class="stat-value">12</div>
+          <div class="stat-value" id="statCities">0</div>
           <div class="stat-sub info">Across India</div>
         </div>
       </div>
@@ -66,19 +67,16 @@
             <span class="search-icon">🔍</span>
             <input type="text" placeholder="Search by name, phone, city…" oninput="searchCustomers(this.value)" />
           </div>
-          <select class="filter-select">
-            <option>All Cities</option>
-            <option>Mumbai</option>
-            <option>Delhi</option>
-            <option>Bangalore</option>
-            <option>Chennai</option>
-            <option>Hyderabad</option>
+          <!-- Filter selects — add onchange handlers and ids -->
+          <select class="filter-select" id="cityFilter" onchange="setCityFilter(this.value)">
+            <option value="all">All Cities</option>
+            <!-- populated dynamically -->
           </select>
-          <select class="filter-select">
-            <option>All Customers</option>
-            <option>Repeat Buyers</option>
-            <option>New Customers</option>
-            <option>High Spenders</option>
+          <select class="filter-select" onchange="setTypeFilter(this.value)">
+            <option value="all">All Customers</option>
+            <option value="repeat">Repeat Buyers</option>
+            <option value="new">New Customers</option>
+            <option value="highspend">High Spenders</option>
           </select>
         </div>
       </div>
@@ -128,6 +126,7 @@
 </div>
 
 <script src="shared.js"></script>
+<script src="../api.js"></script>
 <script src="customers.js"></script>
 </body>
 </html>

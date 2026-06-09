@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - Custom Orders</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #faf7f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .order-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border-left: 5px solid #c9856a;
+    }
+
+    .row {
+      margin: 6px 0;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #222;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      background: #eee;
+      margin-top: 6px;
+    }
+
+    .contact-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #25D366;
+      color: white;
+      font-weight: bold;
+    }
+
+    .image {
+      width: 120px;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>📦 Custom Orders</h1>
+
+  <div class="container" id="orders-container">
+    <p class="empty">Loading orders...</p>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:3000/api";
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`${API_BASE}/customOrder/custom-orders`, {
+          credentials: "include"
+        });
+
+        const data = await res.json();
+        const orders = data.orders || [];
+
+        const container = document.getElementById("orders-container");
+
+        if (!orders.length) {
+          container.innerHTML = `<p class="empty">No custom orders found 🌸</p>`;
+          return;
+        }
+
+        container.innerHTML = orders.map(order => `
+          <div class="order-card">
+
+            <div class="title">
+              ${order.name} 
+              <span class="badge">${order.status}</span>
+            </div>
+
+            <div class="row"><b>Contact:</b> ${order.contact}</div>
+            <div class="row"><b>Product Type:</b> ${order.productType}</div>
+            <div class="row"><b>Flowers:</b> ${(order.flowerSelection || []).join(", ")}</div>
+            <div class="row"><b>Wrapper:</b> ${order.wrapperStyle || "N/A"}</div>
+            <div class="row"><b>Budget:</b> ${order.budget || "Not specified"}</div>
+            <div class="row"><b>Quantity:</b> ${order.quantity}</div>
+            <div class="row"><b>Occasion:</b> ${order.occasion || "N/A"}</div>
+            <div class="row"><b>Description:</b> ${order.description}</div>
+
+            ${order.referenceImage ? `
+              <img class="image" src="${order.referenceImage}" />
+            ` : ""}
+
+            <button class="contact-btn"
+              onclick="contactCustomer('${order.contact}')">
+              📞 Contact Customer
+            </button>
+
+          </div>
+        `).join("");
+
+      } catch (err) {
+        document.getElementById("orders-container").innerHTML =
+          `<p class="empty">Failed to load orders ❌</p>`;
+        console.error(err);
+      }
+    }
+
+    function contactCustomer(contact) {
+      // WhatsApp fallback (best for India)
+      window.open(`https://wa.me/${contact}`, "_blank");
+    }
+
+    fetchOrders();
+  </script>
+
+<script src="customOrders.js"></script>
+<script src="../api.js"></script>
+</body>
+</html>

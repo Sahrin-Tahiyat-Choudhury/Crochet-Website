@@ -18,6 +18,7 @@
       <li><a href="home.html">Shop</a></li>
       <li><a href="product.html">Products</a></li>
       <li><a href="cart.html">Cart</a></li>
+      <li><a href="orders.html">My Orders</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
@@ -42,39 +43,121 @@
     <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
     <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
     <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="orders.html" onclick="toggleMobileNav()">My Orders</a></li>
     <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
     <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
   </ul>
 </div>
-<section id="myob" class="myob-bg" style="padding:80px 20px">
-  <div class="myob-inner">
-    <div class="myob-text">
-      <p class="section-label">Personalise It</p>
-      <h2 class="section-title">Make Your <em>Own</em><br>Bouquet</h2>
-      <p class="section-sub">Choose your size, pick your flowers, and we'll craft a one-of-a-kind bouquet just for you. Perfect for gifting or keeping!</p>
-      <div class="myob-steps">
-        <div class="myob-step"><div class="step-num">1</div><div class="step-text"><strong>Choose your bouquet size</strong><br>Mini, Small, Medium, or Large — pick what fits your budget.</div></div>
-        <div class="myob-step"><div class="step-num">2</div><div class="step-text"><strong>Select your flowers & colors</strong><br>Roses, tulips, sunflowers, lilies — in your favorite shades.</div></div>
-        <div class="myob-step"><div class="step-num">3</div><div class="step-text"><strong>Add personal touches</strong><br>Ribbon color, packaging style, and a personal note.</div></div>
-        <div class="myob-step"><div class="step-num">4</div><div class="step-text"><strong>We craft & ship!</strong><br>Allow 5–7 business days for your custom creation.</div></div>
-      </div>
-      <a href="#custom" class="btn-primary">Start Customising →</a>
+<section id="myob" class="custom-order-bg">
+
+    <div class="custom-order-wrap">
+
+        <div class="custom-info">
+
+            <p class="section-label">
+                Build Your Bouquet
+            </p>
+
+            <h2 class="section-title">
+                Make Your <em>Own</em> Bouquet
+            </h2>
+
+            <p class="section-sub">
+                Choose flowers, wrapper and quantity.
+                We'll handcraft it specially for you.
+            </p>
+
+        </div>
+
+        <div class="custom-form">
+
+            <h3>
+                Create Your Bouquet 🌸
+            </h3>
+
+            <!-- FLOWERS -->
+
+            <div class="form-row">
+
+                <label class="form-label">
+                    Choose Flowers
+                </label>
+
+                <div
+                    id="myob-products-grid"
+                    class="myob-products-grid"
+                >
+                </div>
+
+            </div>
+
+            <!-- WRAPPER -->
+
+            <div class="form-row">
+
+                <label class="form-label">
+                    Wrapper
+                </label>
+
+                <select
+                    id="myob-wrapper"
+                    class="form-select"
+                >
+                    <option value="">
+                        Select wrapper
+                    </option>
+                </select>
+
+            </div>
+
+            <!-- SUMMARY -->
+
+            <div
+                id="myob-summary-wrap"
+                style="
+                    display:none;
+                    margin-top:20px;
+                    padding:15px;
+                    border:1px solid #ddd;
+                    border-radius:10px;
+                "
+            >
+
+                <h4>Your Bouquet</h4>
+
+                <div id="myob-summary-items"></div>
+
+                <hr>
+
+                <p>
+                    Total Flowers:
+                    <span id="myob-stem-count">
+                        0
+                    </span>
+                </p>
+
+                <p>
+                    Estimated Price:
+                    <strong id="myob-total-price">
+                        ₹0
+                    </strong>
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="btn-primary"
+                onclick="submitMyobOrder()"
+                style="width:100%;margin-top:20px"
+            >
+                Submit Bouquet Order 🌸
+            </button>
+
+        </div>
+
     </div>
-    <div class="myob-card-wrap">
-      <div class="bouquet-size-card" onclick="showToast('Mini Bouquet selected!')">
-        <div class="bs-icon">🌸</div><div class="bs-name">Mini</div><div class="bs-stems">3–5 stems</div><div class="bs-price">₹199</div>
-      </div>
-      <div class="bouquet-size-card" onclick="showToast('Small Bouquet selected!')">
-        <div class="bs-icon">💐</div><div class="bs-name">Small</div><div class="bs-stems">6–8 stems</div><div class="bs-price">₹349</div>
-      </div>
-      <div class="bouquet-size-card" onclick="showToast('Medium Bouquet selected!')">
-        <div class="bs-icon">🌺</div><div class="bs-name">Medium</div><div class="bs-stems">9–12 stems</div><div class="bs-price">₹559</div>
-      </div>
-      <div class="bouquet-size-card" onclick="showToast('Large Bouquet selected!')">
-        <div class="bs-icon">🪻</div><div class="bs-name">Large</div><div class="bs-stems">13–18 stems</div><div class="bs-price">₹899</div>
-      </div>
-    </div>
-  </div>
+
 </section>
 
 <section id="custom" class="custom-order-bg">
@@ -119,21 +202,49 @@
     </div>
     <div class="custom-form">
       <h3 style="font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--dark);margin-bottom:24px">Tell us what you need 🌸</h3>
-      <div class="form-row"><label class="form-label">Your Name</label><input type="text" class="form-input" placeholder="Your name"></div>
+      <div class="form-row"><label class="form-label">Your Name</label><input id="custom-name" type="text" class="form-input" placeholder="Your name"></div>
+      <div class="form-row"><label class="form-label">Email or Phone</label><input id="custom-contact" type="text" class="form-input" placeholder="Your email or phone"></div>
       <div class="form-row"><label class="form-label">What would you like?</label>
-        <select class="form-select"><option value="">Select product type</option><option>Custom Bouquet</option><option>Mini Bouquet</option><option>Single Stem</option><option>Keychain</option><option>Home Decor</option><option>Desk Buddy</option><option>Gift Set</option><option>Something else...</option></select>
+        <select id="custom-product-type" class="form-select"><option value="">Select product type</option><option>Custom Bouquet</option><option>Mini Bouquet</option><option>Single Stem</option><option>Keychain</option><option>Home Decor</option><option>Desk Buddy</option><option>Gift Set</option><option>Something else...</option></select>
       </div>
       <div class="form-grid">
-        <div class="form-row"><label class="form-label">Preferred Colors</label><input type="text" class="form-input" placeholder="e.g. Pink, White, Peach"></div>
-        <div class="form-row"><label class="form-label">Budget (₹)</label><input type="text" class="form-input" placeholder="e.g. ₹500–800"></div>
+        <div class="form-row"><label class="form-label">Preferred Colors</label><input id="custom-colors" type="text" class="form-input" placeholder="e.g. Pink, White, Peach"></div>
+        <div class="form-row"><label class="form-label">Budget (₹)</label><input id="custom-budget" type="text" class="form-input" placeholder="e.g. ₹500–800"></div>
       </div>
-      <div class="form-row"><label class="form-label">Occasion / Purpose</label>
-        <select class="form-select"><option value="">Select occasion</option><option>Birthday Gift</option><option>Anniversary</option><option>Wedding</option><option>Baby Shower</option><option>Home Decoration</option><option>Just for myself</option><option>Other</option></select>
+      <div class="form-row">
+        <label class="form-label">Choose your flowers</label>
+        <div id="custom-flower-chips"></div>
+        <div class="field-note">
+          Pick one or more flowers for your bouquet.
+        </div>
+      </div>
+      <div class="form-row">
+
+                <label class="form-label">
+                    Wrapper
+                </label>
+
+                <select
+                    id="co-wrapper"
+                    class="form-select"
+                >
+                    <option value="">
+                        Select wrapper
+                    </option>
+                </select>
+
+            </div>
+      <input type="hidden" id="custom-bouquet-size" value="">
+      <div class="form-grid">
+        <div class="form-row"><label class="form-label">Quantity</label><input id="custom-quantity" type="number" min="1" class="form-input" placeholder="1"></div>
+        <div class="form-row"><label class="form-label">Occasion / Purpose</label>
+          <select id="custom-occasion" class="form-select"><option value="">Select occasion</option><option>Wedding</option><option>Home Decoration</option><option>Just for myself</option></select>
+        </div>
       </div>
       <div class="form-row"><label class="form-label">Additional Details / References</label>
-        <textarea class="form-textarea" placeholder="Describe your vision — size, flowers, colors, packaging preferences..."></textarea>
+        <textarea id="custom-description" class="form-textarea" placeholder="Describe your vision — size, flowers, colors, packaging preferences..."></textarea>
       </div>
-      <button class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="showToast('✅ Request sent! We\'ll contact you soon.')">Send Custom Request 🌸</button>
+      <button type="button" class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="submitCustomOrder()">Send Custom Request 🌸</button>
     </div>
   </div>
 </section>
@@ -199,6 +310,8 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script src="script.js"></script>
+<script src="api.js"></script>
 </body>
 </html>

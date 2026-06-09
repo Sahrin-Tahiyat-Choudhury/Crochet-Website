@@ -18,5 +18,6 @@ router.get("/get-me", authMiddleware.authUserAndAdmin, authController.getMeContr
 router.get("/get-all-users", authMiddleware.authAdmin, authController.getAllUsersController)
 router.patch("/change-password", authMiddleware.authUserAndAdmin, userController.changePassword)
 router.patch("/update-profile", authMiddleware.authUserAndAdmin, userController.updateProfile)
+router.patch("/upload-photo", authMiddleware.authUserAndAdmin, userController.uploadPhoto)
 
 module.exports = router;

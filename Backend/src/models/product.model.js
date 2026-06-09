@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
     uri:{
         type: String,
-        required: true,
+        required: false,
+        default: "",  // ← changed this
+    
     },
     name:{
         type: String,
@@ -33,6 +35,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    lowStockAlertAt: {
+        type: Number,
+        default: 3
+    },
     sold: {
         type: Number,
         default: 0,
@@ -54,6 +60,10 @@ const productSchema = new mongoose.Schema({
     isHidden:{
         type: Boolean,
         default: false
+    },
+    isDraft:{
+        type:Boolean,
+        default:false
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,

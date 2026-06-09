@@ -20,7 +20,7 @@ async function postReview(req,res) {
             return res.status(400).json({ message: 'Rating must be between 1 and 5' });
         }
 
-        const product = await Product.findById(productId);
+        const product = await productModel.findById(productId);
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
@@ -100,7 +100,6 @@ async function editReview(req,res){
         }
 }
 
-
 async function respondToReview(req, res) {
     try {
         const { reviewId } = req.params;
@@ -163,4 +162,41 @@ async function deleteReview(req,res){
         }
 }
 
-module.exports = {postReview,editReview,respondToReview,deleteReview}
+async function getProductReviews(req, res) {
+    try {
+        const { productId } = req.params;
+
+        const reviews = await reviewModel
+            .find({ productId })
+            .populate('userId', 'name')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(reviews);
+    }
+    catch (error) {
+        res.status(500).json({
+            message: 'Error fetching reviews',
+            error: error.message
+        });
+    }
+}
+
+async function getAllReviews(req, res) {
+    try {
+        const reviews = await reviewModel
+            .find()
+            .populate('userId', 'name')
+            .populate('productId', 'name')
+            .sort({ createdAt: -1 })
+            .limit(10);
+
+        res.json(reviews);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Error fetching reviews',
+            error: error.message
+        });
+    }
+}
+
+module.exports = {postReview,editReview,respondToReview,deleteReview,getProductReviews,getAllReviews}

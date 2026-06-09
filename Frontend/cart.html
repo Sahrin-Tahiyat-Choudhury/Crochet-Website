@@ -60,37 +60,45 @@
       <div style="display:flex;justify-content:space-between;font-family:var(--font-display);font-size:22px;font-weight:600;color:var(--dark);margin-bottom:20px">
         <span>Total</span><span id="cart-page-total">₹0.00</span>
       </div>
-      <button class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="showToast('🎉 Checkout coming soon!')">Proceed to Checkout →</button>
+      <div id="checkout-form" style="display:none;margin-top:20px;gap:12px;flex-direction:column;">
+        <!-- Replace the existing checkout form inputs with: -->
+
+        <!-- Coupon Code -->
+<div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+  <input 
+    id="checkout-coupon" 
+    type="text" 
+    placeholder="Coupon code (optional)" 
+    style="flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;text-transform:uppercase"
+    oninput="this.value=this.value.toUpperCase()"
+  />
+  <button 
+    type="button"
+    onclick="applyCouponCode()" 
+    style="padding:12px 18px;background:var(--peach);border:none;border-radius:10px;cursor:pointer;font-weight:500;white-space:nowrap"
+  >
+    Apply
+  </button>
+</div>
+<div id="coupon-feedback" style="font-size:13px;margin-bottom:12px;display:none"></div>
+        <p style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--dark);margin-bottom:12px">Shipping Details</p>
+        <input id="checkout-fullname" type="text" placeholder="Full Name" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px" />
+        <input id="checkout-phone" type="tel" placeholder="Phone Number" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px" />
+        <input id="checkout-street" type="text" placeholder="Street Address" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px" />
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+          <input id="checkout-city" type="text" placeholder="City" style="padding:12px;border:1px solid var(--border);border-radius:10px" />
+          <input id="checkout-state" type="text" placeholder="State" style="padding:12px;border:1px solid var(--border);border-radius:10px" />
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <input id="checkout-zip" type="text" placeholder="Zip Code" style="padding:12px;border:1px solid var(--border);border-radius:10px" />
+          <input id="checkout-country" type="text" placeholder="Country" style="padding:12px;border:1px solid var(--border);border-radius:10px" />
+        </div>
+      </div>
+      <button class="btn-primary" style="width:100%;padding:15px;font-size:15px" onclick="handleCheckout()">Place Order Request →</button>
       <a href="home.html" class="btn-outline" style="display:block;text-align:center;margin-top:12px;padding:13px">Continue Shopping</a>
     </div>
   </div>
 </section>
-<script>
-function renderCartPage() {
-  const cart = JSON.parse(localStorage.getItem("tyj_cart") || "[]");
-  const itemsEl = document.getElementById("cart-page-items");
-  const emptyEl = document.getElementById("cart-page-empty");
-  const footerEl = document.getElementById("cart-page-footer");
-  const totalEl = document.getElementById("cart-page-total");
-  if (!cart.length) { emptyEl.style.display="block"; footerEl.style.display="none"; return; }
-  emptyEl.style.display="none"; footerEl.style.display="block";
-  itemsEl.innerHTML = cart.map(item => `
-    <div class="cart-item" style="border-bottom:1px solid var(--blush-mid);padding:16px 0;display:flex;gap:14px;align-items:center">
-      <div style="width:70px;height:70px;background:var(--blush);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0">${item.icon}</div>
-      <div style="flex:1">
-        <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--dark)">${item.name}</div>
-        <div style="font-size:14px;color:var(--brown);margin-top:4px">₹${item.sell}</div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
-          <span style="font-size:13px;color:var(--brown-light)">Qty: ${item.qty}</span>
-        </div>
-      </div>
-      <div style="font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--dark)">₹${item.sell * item.qty}</div>
-    </div>`).join("");
-  const total = cart.reduce((s,x) => s + x.sell*x.qty, 0);
-  totalEl.textContent = "₹" + total.toFixed(2);
-}
-renderCartPage();
-</script>
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -153,6 +161,8 @@ renderCartPage();
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+<script src="api.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

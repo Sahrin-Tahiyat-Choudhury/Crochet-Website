@@ -18,7 +18,7 @@ const bouquetOrderSchema = new mongoose.Schema({
         },
         color: {
             type: String,
-            required: true
+            default: ''
         }
     }],
     wrapper:{

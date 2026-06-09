@@ -1,9 +1,11 @@
 const customOrderModel = require('../models/customOrder.model');
+const Settings = require('../models/settings.model');
 const {uploadFile} = require('../services/storage.services');
+const { sendEmail } = require('../utils/sendEmail');
 
 async function createCustomOrder(req,res){
     try{
-        const { productType, description, colorPreference, quantity, budget, name, contact } = req.body;
+        const { productType, bouquetSize, flowerSelection, wrapperStyle, description, colorPreference, quantity, budget, name, contact, occasion } = req.body;
 
         if(!productType || !description || !quantity || !name || !contact){
             return res.status(400).json({ message: 'Please fill all required fields' });
@@ -18,14 +20,35 @@ async function createCustomOrder(req,res){
          const customOrder = await customOrderModel.create({
             user: req.user?.id || null,
             productType,
+            bouquetSize: bouquetSize || '',
+            flowerSelection: Array.isArray(flowerSelection)
+                ? flowerSelection
+                : flowerSelection ? [flowerSelection] : [],
+            wrapperStyle: wrapperStyle || '',
+            occasion,
             description,
             colorPreference,
-            quantity,
-            budget,
+            quantity: Number(quantity) || 1,
+            budget: budget ? Number(budget.toString().replace(/[^0-9.]/g, '')) : null,
             referenceImage,
             name,
             contact
         });
+
+        const settings = await Settings.findOne();
+        const notificationEmail = process.env.CUSTOM_ORDER_NOTIFICATION_EMAIL || settings?.contactEmail || process.env.CONTACT_NOTIFICATION_EMAIL || process.env.EMAIL_USER;
+
+        if (notificationEmail) {
+            try {
+                await sendEmail({
+                    to: notificationEmail,
+                    subject: `New custom order request from ${name}`,
+                    text: `New custom order request details:\n\nName: ${name}\nContact: ${contact}\nProduct type: ${productType}\nBouquet size: ${bouquetSize || 'Not specified'}\nFlowers: ${Array.isArray(customOrder.flowerSelection) ? customOrder.flowerSelection.join(', ') : 'None'}\nWrapper: ${customOrder.wrapperStyle || 'No preference'}\nColors: ${colorPreference || 'No preference'}\nBudget: ${budget || 'Not specified'}\nQuantity: ${customOrder.quantity}\nOccasion: ${occasion || 'None'}\nDescription: ${description}\n\nReference Image: ${referenceImage || 'None'}`
+                });
+            } catch (emailError) {
+                console.warn('Custom order saved but failed to send notification email:', emailError.message);
+            }
+        }
 
         return res.status(201).json({ message: 'Custom order submitted successfully', customOrder });
     

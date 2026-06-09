@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Orders — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="admin-layout">
@@ -14,12 +14,11 @@
     <div class="page-header">
       <div class="page-header-left">
         <h1>Orders</h1>
-        <p>Track and manage customer orders · 7 pending</p>
+        <p id="pageSubtitle">Track and manage customer orders</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-outline" onclick="showToast('Exporting orders…','info')">📤 Export</button>
-        <button class="btn btn-primary" onclick="openModal('manualOrderModal')">＋ Manual Order</button>
-      </div>
+        <button onclick="exportOrders()">📤 Export</button>        
+<button class="btn btn-primary" onclick="openManualOrderModal()">＋ Manual Order</button>      </div>
     </div>
 
     <!-- Stat Cards -->
@@ -28,7 +27,7 @@
         <div class="stat-icon">📦</div>
         <div class="stat-info">
           <div class="stat-label">Total Orders</div>
-          <div class="stat-value">148</div>
+          <div class="stat-value" id="totalOrders">0</div>
           <div class="stat-sub">↑ 12 this month</div>
         </div>
       </div>
@@ -36,7 +35,7 @@
         <div class="stat-icon">⏳</div>
         <div class="stat-info">
           <div class="stat-label">Pending</div>
-          <div class="stat-value">7</div>
+          <div class="stat-value" id="pendingOrders">0</div>
           <div class="stat-sub warn">Needs attention</div>
         </div>
       </div>
@@ -44,7 +43,7 @@
         <div class="stat-icon">🚚</div>
         <div class="stat-info">
           <div class="stat-label">Shipped</div>
-          <div class="stat-value">18</div>
+          <div class="stat-value" id="shippedOrders">0</div>
           <div class="stat-sub info">In transit</div>
         </div>
       </div>
@@ -52,7 +51,7 @@
         <div class="stat-icon">💰</div>
         <div class="stat-info">
           <div class="stat-label">Revenue (Month)</div>
-          <div class="stat-value">₹42k</div>
+          <div class="stat-value" id="monthlyRevenue">₹0</div>
           <div class="stat-sub">↑ 8% vs last month</div>
         </div>
       </div>
@@ -63,9 +62,9 @@
         <span class="card-title">All Orders</span>
         <div style="display:flex;gap:8px;">
           <button class="btn btn-outline btn-sm" onclick="filterOrders('all')" id="tab-all" style="background:var(--accent);color:#fff;border-color:var(--accent);">All</button>
-          <button class="btn btn-outline btn-sm" onclick="filterOrders('Pending')" id="tab-pending">Pending</button>
-          <button class="btn btn-outline btn-sm" onclick="filterOrders('Shipped')" id="tab-shipped">Shipped</button>
-          <button class="btn btn-outline btn-sm" onclick="filterOrders('Delivered')" id="tab-delivered">Delivered</button>
+          <button class="btn btn-outline btn-sm" onclick="filterOrders('pending')" id="tab-pending">Pending</button>
+          <button class="btn btn-outline btn-sm" onclick="filterOrders('shipped')" id="tab-shipped">Shipped</button>
+          <button class="btn btn-outline btn-sm" onclick="filterOrders('delivered')" id="tab-delivered">Delivered</button>
         </div>
       </div>
       <div class="card-body" style="padding-bottom:0;">
@@ -74,13 +73,17 @@
             <span class="search-icon">🔍</span>
             <input type="text" placeholder="Search order ID, customer, product…" oninput="searchOrders(this.value)" />
           </div>
-          <select class="filter-select">
-            <option>All Payment</option>
-            <option>Paid</option>
-            <option>Pending</option>
-            <option>Refunded</option>
+          <select class="filter-select" onchange="setPaymentFilter(this.value)">
+            <option value="all">All Payment</option>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+            <option value="refunded">Refunded</option>
           </select>
-          <input type="date" class="filter-select" style="min-width:150px;" />
+
+          <select class="filter-select" onchange="setDateSort(this.value)" style="min-width:150px;">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
         </div>
       </div>
 
@@ -124,12 +127,12 @@
     <div class="modal-body" id="orderDetailBody">
       <!-- filled by JS -->
     </div>
+    <!-- After modal-footer, close the .modal div -->
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('orderDetailModal')">Close</button>
-      <button class="btn btn-outline" onclick="showToast('Invoice downloaded','info')">📄 Invoice</button>
-      <button class="btn btn-primary" onclick="showToast('Status updated','success');closeModal('orderDetailModal')">Update Status</button>
+      <button class="btn btn-primary" id="updateOrderBtn">Update Status</button>
     </div>
-  </div>
+  </div>  <!-- ← this was missing -->
 </div>
 
 <!-- Manual Order Modal -->
@@ -142,30 +145,29 @@
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">Customer Name</label>
-        <input class="form-input" placeholder="Full name" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Phone / Email</label>
-        <input class="form-input" placeholder="Contact details" />
-      </div>
+<select id="manualCustomerId" class="form-select">
+    <option value="">Select customer…</option>
+  </select>      </div>
+  <div class="form-group">
+  <label class="form-label">Contact (Phone / Email)</label>
+  <input id="manualContact" class="form-input" placeholder="Contact details" />
+</div>
+      
       <div class="form-group">
         <label class="form-label">Product</label>
-        <select class="form-select">
-          <option>Select product…</option>
-          <option>Sunflower Bouquet — ₹849</option>
-          <option>Rose Bunch (Pink) — ₹699</option>
-          <option>Lavender Wreath — ₹1,199</option>
-          <option>Daisy Gift Set — ₹1,499</option>
-        </select>
+        <!-- populated dynamically — see below -->
+<select id="manualProduct" class="form-select">
+  <option value="">Select product…</option>
+</select>
       </div>
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Quantity</label>
-          <input class="form-input" type="number" value="1" min="1" />
+          <input id="manualQuantity" class="form-input" type="number" value="1" min="1" />
         </div>
         <div class="form-group">
           <label class="form-label">Payment Method</label>
-          <select class="form-select">
+          <select id="manualPayment" class="form-select">
             <option>UPI</option>
             <option>Cash</option>
             <option>Bank Transfer</option>
@@ -175,17 +177,19 @@
       </div>
       <div class="form-group">
         <label class="form-label">Delivery Address</label>
-        <textarea class="form-textarea" placeholder="Full delivery address…"></textarea>
+        <textarea id="manualAddress" class="form-textarea"></textarea>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('manualOrderModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="showToast('Order created! 📦','success');closeModal('manualOrderModal')">Create Order</button>
+      <button class="btn btn-primary" onclick="createManualOrder()">Create Order</button>
     </div>
   </div>
 </div>
 
 <script src="shared.js"></script>
+<script src="../api.js"></script>
 <script src="orders.js"></script>
+
 </body>
 </html>

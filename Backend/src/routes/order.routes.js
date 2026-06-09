@@ -19,7 +19,9 @@ router.get('/my-orders', authMiddleware.authUser, orderController.getMyOrders);
 router.get('/order-history', authMiddleware.authUser, orderController.getOrderHistory);
 router.get('/order-details/:orderId', authMiddleware.authUser, orderController.getOrderDetails);
 router.patch('/track-order/:orderId', authMiddleware.authUser, orderController.trackOrderStatus);
-router.post('/refund-request/:orderId',authMiddleware.authUser, orderController.refundRequest)
+router.post('/refund-request/:orderId',authMiddleware.authUser, orderController.refundRequest);
+// order.routes.js
+router.patch('/confirm-payment/:id', authMiddleware.authUser, orderController.confirmPayment);
 /* 
 Admin Access
 
@@ -36,6 +38,7 @@ Admin Access
 */
 router.get('/all-orders', authMiddleware.authAdmin, orderController.getAllOrders);
 router.patch('/update-order-status/:orderId', authMiddleware.authAdmin, orderController.updateOrderStatus);
+router.post('/manual-order', authMiddleware.authAdmin, orderController.placeOrder);
 
 
 router.patch('/cancel-order/:orderId', authMiddleware.authUserAndAdmin, orderController.cancelOrder);

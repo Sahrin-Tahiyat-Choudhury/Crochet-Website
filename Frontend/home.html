@@ -18,6 +18,7 @@
       <li><a href="home.html">Shop</a></li>
       <li><a href="product.html">Products</a></li>
       <li><a href="cart.html">Cart</a></li>
+      <li><a href="orders.html">My Orders</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
@@ -42,6 +43,7 @@
     <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
     <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
     <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="orders.html" onclick="toggleMobileNav()">My Orders</a></li>
     <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
     <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
   </ul>
@@ -52,29 +54,8 @@
     <h2 class="section-title">Shop Our <em>Collections</em></h2>
     <p class="section-sub">Every piece is made to order — explore our full range of handcrafted crochet creations.</p>
     <div class="cat-grid">
-      <div class="cat-card" onclick="filterProducts('bouquets',null);document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        <span class="cat-icon">💐</span><div class="cat-name">Bouquets</div><span class="cat-count">4 products</span>
-      </div>
-      <div class="cat-card" onclick="filterProducts('mini',null);document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        <span class="cat-icon">🌷</span><div class="cat-name">Mini Bouquets</div><span class="cat-count">3 products</span>
-      </div>
-      <div class="cat-card" onclick="filterProducts('keychain',null);document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        <span class="cat-icon">🥀</span><div class="cat-name">Single Stems</div><span class="cat-count">2 products</span>
-      </div>
-      <div class="cat-card" onclick="filterProducts('desk',null);document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        <span class="cat-icon">🪴</span><div class="cat-name">Desk Buddies</div><span class="cat-count">3 products</span>
-      </div>
-      <div class="cat-card" onclick="filterProducts('keychain',null);document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        <span class="cat-icon">🔑</span><div class="cat-name">Keychains</div><span class="cat-count">5 products</span>
-      </div>
-      <div class="cat-card" onclick="filterProducts('decor',null);document.getElementById('featured').scrollIntoView({behavior:'smooth'})">
-        <span class="cat-icon">🏡</span><div class="cat-name">Home Decor</div><span class="cat-count">4 products</span>
-      </div>
-      <div class="cat-cta" onclick="window.location.href='product.html'">
-        <span style="font-size:30px">✨</span>
-        <div class="cat-name">Make Your Own Bouquet</div>
-        <span style="font-size:13px;color:var(--brown-light)">Customize → Order</span>
-      </div>
+      
+    </div>
     </div>
   </div>
 </section>
@@ -94,9 +75,11 @@
         <select class="filter-btn" onchange="sortProducts(this.value)" style="padding-right:30px">
           <option value="">Sort by</option>
           <option value="new">Newest</option>
+          <option value="old">Oldest</option>
           <option value="low">Price: Low to High</option>
           <option value="high">Price: High to Low</option>
           <option value="az">A–Z</option>
+          <option value="za">Z-A</option>
         </select>
       </div>
     </div>
@@ -168,6 +151,6 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="script.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>

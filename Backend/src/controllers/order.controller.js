@@ -1,7 +1,10 @@
 const productModel = require('../models/product.model');
 const orderModel = require('../models/order.model');
+const userModel = require('../models/user.model');
 const { sendEmail } = require('../utils/sendEmail');
 const { getCouponDiscount } = require('../services/coupon.service')
+const settingsModel = require('../models/settings.model');
+
 //User Access
 
 // Place order
@@ -9,7 +12,13 @@ async function placeOrder(req, res) {
 
     try{
     const { products, address, couponCode} = req.body;
-    
+    const isAdminOrder = req.user.role === "admin";
+    if (isAdminOrder && !req.body.userId) {
+  return res.status(400).json({ message: "userId is required for manual orders" });
+}
+const orderUserId = isAdminOrder ? req.body.userId : req.user.id;
+
+
     if(!products || !products.length || !address) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -55,7 +64,7 @@ async function placeOrder(req, res) {
 }
     
     const order = await orderModel.create({
-        userId : req.user.id,
+        userId: orderUserId,
         products: orderProducts,
         totalAmount,
         finalAmount,
@@ -76,8 +85,13 @@ async function placeOrder(req, res) {
         }
     }
 
-    const message = 'Dear ${req.user.username},Your order with ID ${order._id} has been placed successfully!Please allow 1-2 business days for processing. we will notify you once it is approved. Below are your order details:Order ID: ${order._id} Total Amount: ₹$${order.totalAmount} Shipping Address: ${order.address.street}, ${order.address.city}, ${order.address.state}, ${order.address.zipCode}, ${order.address.country}Thank you for shopping with us! Best regards, Yarn Journey';
-    const emailText = `Dear ${req.user.username},
+
+const orderUser = isAdminOrder
+    ? await userModel.findById(orderUserId).select('email username')
+    : req.user;
+
+if (orderUser?.email) {
+    const emailText = `Dear ${orderUser.username},
 
 Your order with ID ${order._id} has been placed successfully!
 
@@ -85,21 +99,31 @@ Please allow 1-2 business days for processing. We will notify you once it is app
 
 Order details:
 Order ID: ${order._id}
-Subtotal: ${order.totalAmount}
-Discount: ${order.discountAmount}
-Final Amount: ${order.finalAmount}
+Subtotal: ₹${order.totalAmount}
+Discount: ₹${order.discountAmount}
+Final Amount: ₹${order.finalAmount}
 Shipping Address: ${order.address.street}, ${order.address.city}, ${order.address.state}, ${order.address.zipCode}, ${order.address.country}
 
 Thank you for shopping with us!
 
 Best regards,
-Yarn Journey`;
+The Yarn Journey`;
 
     await sendEmail({
-        to: req.user.email,
+        to: orderUser.email,
         subject: 'Order Confirmation',
         text: emailText
     });
+}
+// Notify admin of new order
+const adminEmail = process.env.EMAIL_USER;
+if (adminEmail) {
+  await sendEmail({
+    to: adminEmail,
+    subject: `New Order Received — #${order._id.toString().slice(-6)}`,
+    text: `A new order has been placed.\n\nOrder ID: ${order._id}\nCustomer: ${orderUser?.username || orderUserId}\nItems: ${orderProducts.length}\nTotal: ₹${order.finalAmount}\n\nLog in to the admin panel to review and approve it.`
+  });
+}
     res.status(201).json({ message: 'Order placed successfully', order });
 } 
 
@@ -240,15 +264,43 @@ async function refundRequest(req,res) {
 - View all orders
 */
 
-async function getAllOrders(req,res){
-    try{
-        const orders = await orderModel.find({}).populate('userId','userId name');
-        res.json(orders);
-    } catch{
-        res.status(500).json({message: 'Error fetching orders'})
-    }
-}
+async function getAllOrders(req, res) {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
+    const sortField = req.query.sortBy || 'createdAt';
+    const sortOrder = req.query.order === 'asc' ? 1 : -1;
+
+    const filter = {};
+
+    if (req.query.status && req.query.status !== 'all') {
+      filter.status = req.query.status;
+    }
+
+    const total = await orderModel.countDocuments(filter);
+
+    const orders = await orderModel.find(filter)
+      .populate('userId', 'username email')
+      .populate('products.productId', 'name')
+      .sort({ [sortField]: sortOrder })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      orders,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching orders' });
+  }
+}
 //Update order status
 
 async function updateOrderStatus(req,res){
@@ -288,6 +340,27 @@ async function updateOrderStatus(req,res){
 
         order.status = status;
         await order.save();
+
+        // Notify customer on key status changes
+const orderUser = await userModel.findById(order.userId).select('email username');
+
+if (orderUser?.email && ['approved', 'cancelled', 'shipped', 'delivered'].includes(status)) {
+  const settings = await settingsModel.findOne();
+const upiId = settings?.payments?.upiId || process.env.UPI_ID || 'your-upi-id@bank';
+
+const messages = {
+  approved: `Your order #${order._id} has been approved!\n\nPlease pay ₹${order.finalAmount} via UPI to ${upiId} and submit your UTR number on the orders page to confirm payment.`,
+  cancelled: `Your order #${order._id} has been cancelled.`,
+  shipped:   `Your order #${order._id} has been shipped and is on its way.`,
+  delivered: `Your order #${order._id} has been delivered. Thank you for shopping with The Yarn Journey! 🧶`
+};
+
+  await sendEmail({
+    to: orderUser.email,
+    subject: `Order ${status.charAt(0).toUpperCase() + status.slice(1)} — #${order._id.toString().slice(-6)}`,
+    text: `Dear ${orderUser.username},\n\n${messages[status]}\n\nBest regards,\nThe Yarn Journey`
+  });
+}
         res.json({message:'Order status updated',order}) 
     } catch(error)
     {
@@ -403,7 +476,28 @@ async function refundOrder(req, res) {
     res.status(500).json({ message: "Error processing refund", error: error.message });
   }
 }
+// order.controller.js
+async function confirmPayment(req, res) {
+  try {
+    const order = await orderModel.findOne({ 
+      _id: req.params.id, 
+      userId: req.user.id 
+    });
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    if (order.status !== 'approved') {
+      return res.status(400).json({ message: 'Order is not yet approved for payment' });
+    }
 
+    order.utrNumber    = req.body.utrNumber;
+    order.paymentStatus = 'paid';
+    order.status        = 'processing';
+    await order.save();
+
+    res.json({ message: 'Payment confirmation received', order });
+  } catch (err) {
+    res.status(500).json({ message: 'Error confirming payment', error: err.message });
+  }
+}
 
 
 
@@ -418,5 +512,6 @@ module.exports = {
     getAllOrders,
     updateOrderStatus,
     cancelOrder,
-    refundOrder
+    refundOrder,
+    confirmPayment
 }

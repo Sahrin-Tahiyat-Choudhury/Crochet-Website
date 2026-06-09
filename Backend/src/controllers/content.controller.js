@@ -6,7 +6,7 @@ async function getHomepage(req, res) {
   try {
     const homepage = await pageContentModel
       .findOne({ pageType: 'homepage' })
-      .populate('featuredProducts', 'name uri price isFeatured isHidden sold stockQuantity')
+      .populate('featuredProducts', 'name imageUrl price isFeatured isHidden sold stockQuantity')
       .populate('featuredCategories', 'name isHidden order');
 
     const banners = await bannerModel.find({ isActive: true }).sort({ order: 1, createdAt: -1 });

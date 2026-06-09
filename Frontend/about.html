@@ -18,6 +18,7 @@
       <li><a href="home.html">Shop</a></li>
       <li><a href="product.html">Products</a></li>
       <li><a href="cart.html">Cart</a></li>
+      <li><a href="orders.html">My Orders</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li><a href="login.html" style="background:var(--peach);color:var(--dark);padding:7px 16px;border-radius:50px;font-weight:500">Login</a></li>
@@ -42,6 +43,7 @@
     <li><a href="home.html" onclick="toggleMobileNav()">Shop</a></li>
     <li><a href="product.html" onclick="toggleMobileNav()">Products</a></li>
     <li><a href="cart.html" onclick="toggleMobileNav()">Cart</a></li>
+    <li><a href="orders.html" onclick="toggleMobileNav()">My Orders</a></li>
     <li><a href="about.html" onclick="toggleMobileNav()">About</a></li>
     <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
   </ul>
@@ -52,22 +54,15 @@
       <div class="big-letter">Y</div>
       <div class="about-visual-card">
         <div class="av-year">✦ Since 2023 · With You</div>
-        <div class="av-quote">"Every stitch is made with intention, love, and a little bit of yarn magic."</div>
-        <div class="av-stats">
-          <div><div class="av-stat-num">500+</div><div class="av-stat-label">Happy orders</div></div>
-          <div><div class="av-stat-num">100%</div><div class="av-stat-label">Handmade</div></div>
-          <div><div class="av-stat-num">3 yrs</div><div class="av-stat-label">Crafting love</div></div>
-        </div>
+        <div class="av-quote" id="about-quote"></div>
+        <div class="av-stats" id="about-stats"></div>
       </div>
     </div>
     <div class="about-text">
-      <p class="section-label">Our Story</p>
-      <h2 class="section-title">The <em>Heart</em> Behind<br>The Yarn</h2>
-      <p><strong>TheYarnJourney</strong> is a small handmade brand run by a single creator who turned a love for crochet into something meaningful.</p>
-      <p>Every flower you see here is carefully made by hand, one piece at a time, with patience and attention to detail. What started as a personal passion has slowly grown into a space where <strong>creativity meets emotion</strong> — creating flowers that don't fade and gifts that last.</p>
-      <p>Behind the scenes, this journey is supported by close friends who helped bring this website to life, making it easier to share these handmade creations with you.</p>
-      <p>This is not a big business — it's a <strong>small, growing journey</strong> built with honesty, effort, and a genuine love for handmade art. Thank you for being a part of it. 🌸</p>
-      <div style="margin-top:28px;"><a href="contact.html" class="btn-primary">Get In Touch</a></div>
+      <p class="section-label" id="story-label"></p>
+      <h2 class="section-title" id="story-title"></h2>
+      <div id="about-paragraphs"></div>
+    <div style="margin-top:28px;"><a href="contact.html" class="btn-primary">Get In Touch</a></div>
     </div>
   </div>
 </section>
@@ -77,13 +72,7 @@
     <p class="section-label">Happy Customers</p>
     <h2 class="section-title">What They're <em>Saying</em></h2>
     <p class="section-sub">Real reviews from real customers — see why they keep coming back for more!</p>
-    <div class="reviews-slider" id="reviews-slider">
-      <div class="review-card"><div class="review-header"><div class="review-avatar">S</div><div><div class="review-name">Sneha M.</div><div class="review-date">March 2026</div></div></div><div class="review-stars">★★★★★</div><p class="review-text">"Absolutely LOVE my bouquet! The colors are exactly what I wanted and the quality is incredible. Will definitely order again!"</p><div class="review-product">Ordered: <span class="review-product-tag">Pink Tulip Bouquet</span></div></div>
-      <div class="review-card"><div class="review-header"><div class="review-avatar">P</div><div><div class="review-name">Priya A.</div><div class="review-date">February 2026</div></div></div><div class="review-stars">★★★★★</div><p class="review-text">"Got the custom bouquet for my mom's birthday — she cried happy tears! The Yarn Journey never disappoints 💕"</p><div class="review-product">Ordered: <span class="review-product-tag">Custom Bouquet</span></div></div>
-      <div class="review-card"><div class="review-header"><div class="review-avatar">A</div><div><div class="review-name">Ananya K.</div><div class="review-date">January 2026</div></div></div><div class="review-stars">★★★★★</div><p class="review-text">"The keychains are ADORABLE. Bought 5 as gifts and they all loved them. Super cute, well-made!"</p><div class="review-product">Ordered: <span class="review-product-tag">Strawberry Keychain</span></div></div>
-      <div class="review-card"><div class="review-header"><div class="review-avatar">D</div><div><div class="review-name">Diya N.</div><div class="review-date">December 2025</div></div></div><div class="review-stars">★★★★★</div><p class="review-text">"I've ordered 3 times now and each time the quality gets better. The desk buddy sunflower makes me happy every day!"</p><div class="review-product">Ordered: <span class="review-product-tag">Sunflower Desk Buddy</span></div></div>
-      <div class="review-card"><div class="review-header"><div class="review-avatar">R</div><div><div class="review-name">Riya S.</div><div class="review-date">November 2025</div></div></div><div class="review-stars">★★★★★</div><p class="review-text">"Got the mini rose bouquet for my anniversary and my husband loved it! 10/10 recommend ✨"</p><div class="review-product">Ordered: <span class="review-product-tag">Mini Rose Bouquet</span></div></div>
-    </div>
+    <div class="reviews-slider" id="reviews-slider"></div>
     <div class="slider-controls">
       <button class="slider-btn" onclick="slideReviews(-1)">←</button>
       <button class="slider-btn" onclick="slideReviews(1)">→</button>
@@ -97,18 +86,7 @@
       <p class="section-label">Got Questions?</p>
       <h2 class="section-title">Frequently Asked <em>Questions</em></h2>
     </div>
-    <div class="faq-list">
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Are all products handmade?<span class="faq-icon">+</span></button><div class="faq-a">Yes, every item is completely handmade using premium yarn.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What type of yarn do you use?<span class="faq-icon">+</span></button><div class="faq-a">We mainly use premium cotton yarn for a soft and long-lasting finish.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How long does it take to prepare an order?<span class="faq-icon">+</span></button><div class="faq-a">The making process usually takes 5–12 days after order confirmation.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">When should I place my order?<span class="faq-icon">+</span></button><div class="faq-a">We recommend placing your order at least 3–4 weeks in advance to ensure timely delivery.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do you offer Cash on Delivery (COD)?<span class="faq-icon">+</span></button><div class="faq-a">No, we only accept prepaid orders.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Can I cancel my order?<span class="faq-icon">+</span></button><div class="faq-a">No, once an order is placed, it cannot be cancelled or refunded.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">Do you take custom orders?<span class="faq-icon">+</span></button><div class="faq-a">Yes! Use our Make Your Own Bouquet section or contact us via Instagram DM.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How can I clean the product?<span class="faq-icon">+</span></button><div class="faq-a">Clean with a soft, slightly damp cloth or gently hand wash with mild detergent.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">What if my product arrives damaged?<span class="faq-icon">+</span></button><div class="faq-a">Provide a full unboxing video (uncut) within 24 hours of delivery to claim any issue.</div></div>
-      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)">How can I contact you?<span class="faq-icon">+</span></button><div class="faq-a">Via Instagram DM (@theyarnjourney) or email: theyarnjourney.shop@gmail.com</div></div>
-    </div>
+    <div class="faq-list" id="faq-list"></div>
   </div>
 </section>
 <footer>

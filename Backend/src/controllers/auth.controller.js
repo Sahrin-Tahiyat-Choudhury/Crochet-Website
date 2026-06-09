@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const tokenBlacklistModel = require('../models/blacklist.model');
 
 async function registerUser(req, res) {
-    const { username, email, password, role = "user" } = req.body;
+    const { username, email, password, phone, role = "user" } = req.body;
     
     const userAlreadyExists = await userModel.findOne ({
         $or: [
@@ -24,6 +24,7 @@ async function registerUser(req, res) {
         username,
         email,
         password: hash,
+        phone,
         role
     })
 
@@ -32,7 +33,11 @@ async function registerUser(req, res) {
         role: user.role
     }, process.env.JWT_SECRET)
 
-    res.cookie("token", token)
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production'
+    })
 
     res.status(201).json({
         message: "User registered successfully",
@@ -70,7 +75,11 @@ async function loginUser(req, res) {
         role: user.role
     }, process.env.JWT_SECRET);
 
-    res.cookie("token", token);
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production'
+    });
 
     res.status(200).json({
         message: "User logged in successfully",
@@ -104,6 +113,8 @@ async function getMeController(req, res) {
             id: user._id,
             username: user.username,
             email: user.email,
+            phone: user.phone,
+            city: user.city,
             role: user.role
         }
     });
@@ -121,4 +132,6 @@ async function getAllUsersController(req, res) {
         res.status(500).json({ message: "Error fetching users", error });
     }
 }
+
+
 module.exports = { registerUser, loginUser, logoutUserController, getMeController, getAllUsersController };

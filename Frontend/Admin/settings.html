@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Settings — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
   <style>
     .settings-layout { display:grid; grid-template-columns:200px 1fr; gap:20px; }
     .settings-nav { display:flex; flex-direction:column; gap:2px; }
@@ -31,7 +31,7 @@
         <p>Manage your store preferences and account</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-primary" onclick="showToast('Settings saved ✔','success')">Save Changes</button>
+        <button id="saveStoreBtn" class="btn btn-primary"> Save Changes </button>
       </div>
     </div>
 
@@ -39,13 +39,13 @@
       <!-- Settings Nav -->
       <div>
         <div class="settings-nav">
-          <div class="settings-nav-item active" onclick="showPanel('store')">🏪 Store Info</div>
-          <div class="settings-nav-item" onclick="showPanel('account')">👤 Account</div>
-          <div class="settings-nav-item" onclick="showPanel('notifications')">🔔 Notifications</div>
-          <div class="settings-nav-item" onclick="showPanel('payment')">💳 Payments</div>
-          <div class="settings-nav-item" onclick="showPanel('shipping')">🚚 Shipping</div>
-          <div class="settings-nav-item" onclick="showPanel('appearance')">🎨 Appearance</div>
-          <div class="settings-nav-item" onclick="showPanel('danger')" style="color:var(--red);">⚠️ Danger Zone</div>
+          <div class="settings-nav-item active" onclick="showPanel(event,'store')">🏪 Store Info</div>
+          <div class="settings-nav-item" onclick="showPanel(event,'account')">👤 Account</div>
+          <div class="settings-nav-item" onclick="showPanel(event,'notifications')">🔔 Notifications</div>
+          <div class="settings-nav-item" onclick="showPanel(event,'payment')">💳 Payments</div>
+          <div class="settings-nav-item" onclick="showPanel(event,'shipping')">🚚 Shipping</div>
+          <div class="settings-nav-item" onclick="showPanel(event,'appearance')">🎨 Appearance</div>
+          <div class="settings-nav-item" onclick="showPanel(event,'danger')" style="color:var(--red);">⚠️ Danger Zone</div>
         </div>
       </div>
 
@@ -57,33 +57,33 @@
           <div class="card-body">
             <div class="form-group">
               <label class="form-label">Store Name</label>
-              <input class="form-input" value="The Yarn Journey" />
+              <input id="storeName" class="form-input"/>
             </div>
             <div class="form-group">
               <label class="form-label">Tagline</label>
-              <input class="form-input" value="Handcrafted Crochet Flowers · Since 2023" />
+              <input  id="tagline" class="form-input" />
             </div>
             <div class="form-group">
               <label class="form-label">Store Description</label>
-              <textarea class="form-textarea">We create beautiful handmade crochet flowers and bouquets that last forever. Each piece is crafted with love and care.</textarea>
+              <textarea  id="description" class="form-textarea"></textarea>
             </div>
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">Contact Email</label>
-                <input class="form-input" type="email" value="hello@theyarnjourney.in" />
+                <input id="contactEmail" class="form-input" type="email" />
               </div>
               <div class="form-group">
                 <label class="form-label">Contact Phone</label>
-                <input class="form-input" value="+91 98765 43210" />
+                <input id="contactPhone" class="form-input" />
               </div>
             </div>
             <div class="form-group">
               <label class="form-label">Store Address</label>
-              <textarea class="form-textarea" style="min-height:65px;">123 Craft Lane, Bandra West, Mumbai - 400050, Maharashtra, India</textarea>
+              <textarea id="address" class="form-textarea"></textarea>
             </div>
             <div class="form-group">
               <label class="form-label">Currency</label>
-              <select class="form-select">
+              <select  id="currency" class="form-select">
                 <option selected>₹ Indian Rupee (INR)</option>
                 <option>$ US Dollar (USD)</option>
                 <option>€ Euro (EUR)</option>
@@ -97,44 +97,50 @@
           <div class="card-header"><span class="card-title">Account Settings</span></div>
           <div class="card-body">
             <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border-light);">
-              <div style="width:64px;height:64px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;">S</div>
+              <div id="profilePhotoDisplay" style="width:64px;height:64px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;">S</div>
               <div>
                 <div style="font-weight:600;font-size:15px;">Shop Owner</div>
                 <div style="color:var(--text-muted);font-size:13px;">Admin · The Yarn Journey</div>
-                <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="showToast('Upload opened','info')">Change Photo</button>
+                <input type="file" id="photoInput" accept="image/*" style="display:none;" />
+                <button id="changePhotoBtn" class="btn btn-outline btn-sm" style="margin-top:8px;">Change Photo</button>
               </div>
             </div>
             <div class="form-grid">
               <div class="form-group">
-                <label class="form-label">First Name</label>
-                <input class="form-input" value="Shop" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Last Name</label>
-                <input class="form-input" value="Owner" />
+                <label class="form-label">Username</label>
+                <input id="username" class="form-input"/>              
               </div>
             </div>
             <div class="form-group">
               <label class="form-label">Email Address</label>
-              <input class="form-input" type="email" value="owner@theyarnjourney.in" />
+              <input id="email" class="form-input" type="email"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label"> Phone Number </label>
+              <input id="phone" class="form-input"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label"> City </label>
+              <input id="city" class="form-input"/>
             </div>
             <div class="divider"></div>
             <div class="form-section-title">CHANGE PASSWORD</div>
             <div class="form-group">
               <label class="form-label">Current Password</label>
-              <input class="form-input" type="password" placeholder="••••••••" />
+              <input id="currentPassword" class="form-input" type="password"/>
             </div>
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">New Password</label>
-                <input class="form-input" type="password" placeholder="••••••••" />
+                <input id="newPassword" class="form-input" type="password" />
+
               </div>
               <div class="form-group">
                 <label class="form-label">Confirm Password</label>
-                <input class="form-input" type="password" placeholder="••••••••" />
+                <input id="confirmPassword" class="form-input" type="password"/>
               </div>
             </div>
-            <button class="btn btn-outline btn-sm" onclick="showToast('Password updated','success')">Update Password</button>
+            <button id=changePasswordBtn class="btn btn-outline btn-sm" onclick="changePassword()"> Update Password </button>
           </div>
         </div>
 
@@ -143,22 +149,54 @@
           <div class="card-header"><span class="card-title">Notification Preferences</span></div>
           <div class="card-body">
             <p style="font-size:13px;color:var(--text-muted);margin-bottom:18px;">Choose which notifications you receive and how.</p>
-            ${[
-              ['New Order Received',      true ],
-              ['Order Status Updated',    true ],
-              ['Low Stock Alert',         true ],
-              ['New Customer Registered', false],
-              ['Promo Code Used',         false],
-              ['Daily Summary Email',     true ],
-              ['Weekly Report',           true ],
-              ['Product Review',          false],
-            ].map(([label, on]) => `
-              <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
-                <div>
-                  <div style="font-size:13.5px;font-weight:500;">${label}</div>
-                </div>
-                <button class="toggle ${on ? 'on' : ''}"></button>
-              </div>`).join('')}
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">New Order Received</div>
+              </div>
+              <button id="newOrder" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">Order Status Updated</div>
+              </div>
+              <button id="orderStatusUpdated" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">Low Stock Alert</div>
+              </div>
+              <button id="lowStockAlert" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">New Customer Registered</div>
+              </div>
+              <button id="newCustomer" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">Promo Code Used</div>
+              </div>
+              <button id= "promoCodeUsed" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">Daily Summary Email</div>
+              </div>
+              <button id="dailySummary" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">Weekly Report</div>
+              </div>
+              <button id="weeklyReport" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:12px 0;">
+              <div>
+                <div style="font-size:13.5px;font-weight:500;">Product Review</div>
+              </div>
+              <button id="productReview" class="toggle"></button>
+            </div>
           </div>
         </div>
 
@@ -167,24 +205,35 @@
           <div class="card-header"><span class="card-title">Payment Settings</span></div>
           <div class="card-body">
             <div class="form-section-title">ACCEPTED METHODS</div>
-            ${[['UPI / GPay / PhonePe',true],['Cash on Delivery',true],['Bank Transfer',true],['Credit / Debit Card',false]].map(([m,on])=>`
-              <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:10px 0;">
-                <span style="font-size:13.5px;font-weight:500;">${m}</span>
-                <button class="toggle ${on?'on':''}"></button>
-              </div>`).join('')}
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:10px 0;">
+              <span style="font-size:13.5px;font-weight:500;">UPI / GPay / PhonePe</span>
+              <button  id="upiEnabled"  class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:10px 0;">
+              <span style="font-size:13.5px;font-weight:500;">Cash on Delivery</span>
+              <button id="codEnabled" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:10px 0;">
+              <span style="font-size:13.5px;font-weight:500;">Bank Transfer</span>
+              <button id="bankTransferEnabled" class="toggle"></button>
+            </div>
+            <div class="toggle-row" style="border-bottom:1px solid var(--border-light);padding:10px 0;">
+              <span style="font-size:13.5px;font-weight:500;">Credit / Debit Card</span>
+              <button id="cardEnabled" class="toggle"></button>
+            </div>
             <div class="divider"></div>
             <div class="form-section-title">UPI DETAILS</div>
             <div class="form-group">
               <label class="form-label">UPI ID</label>
-              <input class="form-input" value="theyarnjourney@upi" />
+              <input id="upiId">
             </div>
             <div class="form-group">
               <label class="form-label">Bank Account Name</label>
-              <input class="form-input" placeholder="Account holder name" />
+              <input id="bankAccountName" placeholder="Account holder name" />
             </div>
             <div class="form-group">
               <label class="form-label">IFSC Code</label>
-              <input class="form-input" placeholder="e.g. HDFC0001234" />
+              <input id="ifscCode" placeholder="e.g. HDFC0001234" />
             </div>
           </div>
         </div>
@@ -195,22 +244,22 @@
           <div class="card-body">
             <div class="form-group">
               <label class="form-label">Default Shipping Fee (₹)</label>
-              <input class="form-input" type="number" value="60" />
+              <input id="shippingFee">
             </div>
             <div class="form-group">
               <label class="form-label">Free Shipping Above (₹)</label>
-              <input class="form-input" type="number" value="999" />
+              <input id="freeShippingAbove">
               <div class="form-hint">Orders above this amount get free shipping automatically.</div>
             </div>
             <div class="form-group">
               <label class="form-label">Estimated Delivery Time</label>
-              <input class="form-input" value="3–7 business days" />
+              <input id="deliveryTime">
             </div>
             <div class="form-group">
               <label class="form-label">Shipping Zones</label>
-              <select class="form-select">
+              <select id="shippingZone">
                 <option>All India</option>
-                <option>Maharashtra Only</option>
+                <option>Assam Only</option>
                 <option>Metro Cities</option>
                 <option>Custom</option>
               </select>
@@ -220,7 +269,7 @@
                 <div style="font-size:13.5px;font-weight:500;">COD Available</div>
                 <div class="form-hint">Allow cash on delivery orders</div>
               </div>
-              <button class="toggle on"></button>
+              <button id="codAvailable" class="toggle"></button>
             </div>
           </div>
         </div>
@@ -231,28 +280,25 @@
           <div class="card-body">
             <div class="form-section-title">THEME COLORS</div>
             <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;">
-              ${['#e8916a','#4a7fc1','#4caf82','#9370DB','#e6a817','#e05c5c'].map((c,i)=>`
-                <div title="${c}" onclick="showToast('Color theme updated','success')" style="width:36px;height:36px;border-radius:50%;background:${c};cursor:pointer;border:${i===0?'3px solid #333':'3px solid transparent'};box-shadow:0 2px 6px rgba(0,0,0,0.15);"></div>`).join('')}
+              <div onclick="changeTheme('#e8916a')" style="width:36px;height:36px;border-radius:50%;background:#e8916a;"></div>
+
+              <div onclick= "changeTheme('#4a7fc1')" style="width:36px;height:36px;border-radius:50%;background:#4a7fc1;"></div>
+              <div onclick= "changeTheme('#4caf82')"  style="width:36px;height:36px;border-radius:50%;background:#4caf82;"></div>
+              <div onclick= "changeTheme('#9370DB')"  style="width:36px;height:36px;border-radius:50%;background:#9370DB;"></div>
+              <div onclick= "changeTheme('#e6a817')"  style="width:36px;height:36px;border-radius:50%;background:#e6a817;"></div>
+              <div onclick= "changeTheme('#e05c5c')"  style="width:36px;height:36px;border-radius:50%;background:#e05c5c;"></div>
             </div>
             <div class="form-group">
               <label class="form-label">Admin Interface Theme</label>
-              <select class="form-select">
-                <option>Light (Default)</option>
-                <option>Dark</option>
-                <option>Auto (System)</option>
+              <select id="interfaceTheme">
+  
+                <option value="light">Light (Default)</option>
+  
+                <option value="dark">Dark</option>
+  
+                <option value="auto">Auto (System)</option>
+
               </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Date Format</label>
-              <select class="form-select">
-                <option>DD MMM YYYY</option>
-                <option>MM/DD/YYYY</option>
-                <option>YYYY-MM-DD</option>
-              </select>
-            </div>
-            <div class="toggle-row">
-              <span style="font-size:13.5px;font-weight:500;">Compact Sidebar</span>
-              <button class="toggle"></button>
             </div>
           </div>
         </div>
@@ -289,19 +335,8 @@
   </main>
 </div>
 
+<script src="../api.js"></script>
 <script src="shared.js"></script>
-<script>
-function showPanel(id) {
-  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderSidebar('settings');
-  initToggles();
-});
-</script>
+<script src="settings.js"></script>
 </body>
 </html>

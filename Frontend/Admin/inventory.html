@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inventory — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="admin-layout">
@@ -17,49 +17,69 @@
         <p>Track stock levels and set alerts</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-outline" onclick="showToast('Stock report exported','info')">📊 Report</button>
-        <button class="btn btn-primary" onclick="openModal('restockModal')">＋ Restock Item</button>
+        <button class="btn btn-outline" onclick="exportCSV()">📊 Export Report</button>
       </div>
     </div>
 
+    <!-- Stat Cards -->
     <div class="stat-cards">
       <div class="stat-card">
         <div class="stat-icon">📦</div>
-        <div class="stat-info"><div class="stat-label">Total Stock Units</div><div class="stat-value">312</div><div class="stat-sub">Across all products</div></div>
+        <div class="stat-info">
+          <div class="stat-label">Total Stock Units</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-sub">Across all products</div>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">⚠️</div>
-        <div class="stat-info"><div class="stat-label">Low Stock</div><div class="stat-value">3</div><div class="stat-sub warn">Below threshold</div></div>
+        <div class="stat-info">
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-value" id="stat-low">—</div>
+          <div class="stat-sub warn">Below threshold</div>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">❌</div>
-        <div class="stat-info"><div class="stat-label">Out of Stock</div><div class="stat-value">1</div><div class="stat-sub" style="color:var(--red);">Needs restock</div></div>
+        <div class="stat-info">
+          <div class="stat-label">Out of Stock</div>
+          <div class="stat-value" id="stat-out">—</div>
+          <div class="stat-sub" style="color:var(--red);">Needs restock</div>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">✅</div>
-        <div class="stat-info"><div class="stat-label">Well Stocked</div><div class="stat-value">26</div><div class="stat-sub">No action needed</div></div>
+        <div class="stat-info">
+          <div class="stat-label">Well Stocked</div>
+          <div class="stat-value" id="stat-ok">—</div>
+          <div class="stat-sub">No action needed</div>
+        </div>
       </div>
     </div>
 
     <!-- Low Stock Alert Banner -->
-    <div style="background:var(--yellow-soft);border:1px solid #f5d06a;border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+    <div id="alertBanner" style="display:none;background:var(--yellow-soft);border:1px solid #f5d06a;border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:20px;">⚠️</span>
       <div>
-        <div style="font-weight:600;font-size:13.5px;color:#9c6e00;">3 items are running low on stock</div>
-        <div style="font-size:12px;color:#b88800;margin-top:2px;">Daisy Gift Set, Carnation Mix, Hibiscus Hairpin are below their alert threshold.</div>
+        <div style="font-weight:600;font-size:13.5px;color:#9c6e00;" id="bannerTitle"></div>
+        <div style="font-size:12px;color:#b88800;margin-top:2px;" id="bannerNames"></div>
       </div>
-      <button class="btn btn-outline btn-sm" style="margin-left:auto;border-color:#e6a817;color:#9c6e00;" onclick="showToast('Restock reminders sent','info')">Notify Me</button>
     </div>
 
+    <!-- Table -->
     <div class="card">
       <div class="card-header">
         <span class="card-title">Stock Levels</span>
-        <div class="filters-row" style="margin:0;">
-          <select class="filter-select" style="min-width:130px;">
-            <option>All Status</option>
-            <option>In Stock</option>
-            <option>Low Stock</option>
-            <option>Out of Stock</option>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="search-box" style="min-width:200px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="invSearch" placeholder="Search products…" oninput="renderTable()" />
+          </div>
+          <select class="filter-select" id="statusFilter" onchange="renderTable()">
+            <option value="">All Status</option>
+            <option value="out">Out of Stock</option>
+            <option value="low">Low Stock</option>
+            <option value="ok">In Stock</option>
           </select>
         </div>
       </div>
@@ -68,7 +88,7 @@
           <thead>
             <tr>
               <th>PRODUCT</th>
-              <th>SKU</th>
+              <th>CATEGORY</th>
               <th>STOCK QTY</th>
               <th>ALERT AT</th>
               <th>STOCK LEVEL</th>
@@ -76,104 +96,312 @@
               <th>ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="inventoryTbody"></tbody>
+          <tbody id="inventoryTbody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
   </main>
 </div>
 
-<!-- Restock Modal -->
+<!-- ══════════════════════════════════
+     RESTOCK / EDIT MODAL
+══════════════════════════════════ -->
 <div class="modal-overlay" id="restockModal">
-  <div class="modal">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <span class="modal-title">Restock Item</span>
+      <span class="modal-title">Update Stock</span>
       <button class="modal-close" onclick="closeModal('restockModal')">✕</button>
     </div>
     <div class="modal-body">
+      <input id="restock-id" type="hidden" />
+
       <div class="form-group">
-        <label class="form-label">Select Product</label>
-        <select class="form-select">
-          <option>Choose product…</option>
-          <option>Daisy Gift Set (Stock: 3)</option>
-          <option>Carnation Mix (Stock: 2)</option>
-          <option>Hibiscus Hairpin (Stock: 1)</option>
-          <option>Peony Bouquet (Stock: 0)</option>
-        </select>
+        <label class="form-label">Product</label>
+        <input id="restock-name" class="form-input" disabled style="background:var(--main-bg);color:var(--text-muted);" />
       </div>
-      <div class="form-group">
-        <label class="form-label">Add Quantity</label>
-        <input class="form-input" type="number" placeholder="Units to add" min="1" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Stock Quantity <span style="color:var(--red)">*</span></label>
+          <input id="restock-qty" class="form-input" type="number" min="0" />
+          <div class="form-hint">Set the new total stock count.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alert Threshold <span style="color:var(--red)">*</span></label>
+          <input id="restock-alert" class="form-input" type="number" min="0" />
+          <div class="form-hint">Warn when stock falls below this.</div>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Update Alert Threshold</label>
-        <input class="form-input" type="number" placeholder="Alert when stock falls below…" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Note</label>
-        <textarea class="form-textarea" placeholder="e.g. Restocked from supplier batch #4…"></textarea>
-      </div>
+      <p id="restock-error" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"></p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('restockModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="showToast('Stock updated! 📦','success');closeModal('restockModal')">Update Stock</button>
+      <button class="btn btn-primary" id="restock-save-btn" onclick="saveRestock()">Update Stock</button>
     </div>
   </div>
 </div>
 
+<script src="../api.js"></script>
 <script src="shared.js"></script>
 <script>
-const INVENTORY = [
-  { name:'Sunflower Bouquet',   sku:'TYJ-001', stock:12, alert:3,  max:20 },
-  { name:'Rose Bunch (Pink)',   sku:'TYJ-002', stock:8,  alert:3,  max:20 },
-  { name:'Lavender Wreath',     sku:'TYJ-003', stock:5,  alert:3,  max:15 },
-  { name:'Daisy Gift Set',      sku:'TYJ-004', stock:3,  alert:5,  max:15 },
-  { name:'Tulip Single Stem',   sku:'TYJ-005', stock:20, alert:5,  max:30 },
-  { name:'Peony Bouquet',       sku:'TYJ-006', stock:0,  alert:3,  max:15 },
-  { name:'Eucalyptus Wreath',   sku:'TYJ-007', stock:6,  alert:2,  max:12 },
-  { name:'Carnation Mix',       sku:'TYJ-008', stock:2,  alert:4,  max:20 },
-  { name:"Baby's Breath Set",   sku:'TYJ-009', stock:9,  alert:3,  max:15 },
-  { name:'Crochet Bookmark',    sku:'TYJ-010', stock:35, alert:5,  max:50 },
-  { name:'Marigold Bunch',      sku:'TYJ-011', stock:14, alert:4,  max:25 },
-  { name:'Lily Wreath',         sku:'TYJ-012', stock:7,  alert:2,  max:12 },
-  { name:'Hibiscus Hairpin',    sku:'TYJ-013', stock:1,  alert:3,  max:20 },
-];
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let products = [];
 
+/* ═══════════════════════════════════
+   BOOT
+═══════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   renderSidebar('inventory');
+  fetchProducts();
+});
+
+/* ═══════════════════════════════════
+   FETCH  —  reuses GET /api/product
+═══════════════════════════════════ */
+async function fetchProducts() {
+  try {
+    const data = await API.products.getAll();
+    products = data.products || [];
+    updateStats();
+    renderBanner();
+    renderTable();
+  } catch (err) {
+    showToast('Failed to load inventory: ' + err.message, 'error');
+    document.getElementById('inventoryTbody').innerHTML =
+      `<tr><td colspan="7" class="empty-state">Failed to load. Check console.</td></tr>`;
+  }
+}
+
+/* ═══════════════════════════════════
+   STATS
+═══════════════════════════════════ */
+function stockStatus(p) {
+  if (p.stockQuantity === 0) return 'out';
+  if (p.stockQuantity <= (p.lowStockAlertAt || 3)) return 'low';
+  return 'ok';
+}
+
+function updateStats() {
+  const total  = products.reduce((s, p) => s + (p.stockQuantity || 0), 0);
+  const low    = products.filter(p => stockStatus(p) === 'low').length;
+  const out    = products.filter(p => stockStatus(p) === 'out').length;
+  const ok     = products.filter(p => stockStatus(p) === 'ok').length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-low').textContent   = low;
+  document.getElementById('stat-out').textContent   = out;
+  document.getElementById('stat-ok').textContent    = ok;
+}
+
+/* ═══════════════════════════════════
+   ALERT BANNER
+═══════════════════════════════════ */
+function renderBanner() {
+  const urgent = products.filter(p => stockStatus(p) === 'low' || stockStatus(p) === 'out');
+  const banner = document.getElementById('alertBanner');
+  if (!urgent.length) { banner.style.display = 'none'; return; }
+
+  banner.style.display = 'flex';
+  document.getElementById('bannerTitle').textContent =
+    `${urgent.length} item${urgent.length > 1 ? 's are' : ' is'} running low or out of stock`;
+  document.getElementById('bannerNames').textContent =
+    urgent.map(p => p.name).join(', ');
+}
+
+/* ═══════════════════════════════════
+   TABLE
+═══════════════════════════════════ */
+function renderTable() {
+  const q      = (document.getElementById('invSearch')?.value || '').toLowerCase();
+  const filter = document.getElementById('statusFilter')?.value || '';
+
+  const filtered = products.filter(p => {
+    const matchSearch = (p.name || '').toLowerCase().includes(q);
+    const matchStatus = !filter || stockStatus(p) === filter;
+    return matchSearch && matchStatus;
+  });
 
   const tbody = document.getElementById('inventoryTbody');
-  tbody.innerHTML = INVENTORY.map(item => {
-    const pct = Math.round((item.stock / item.max) * 100);
+
+  if (!filtered.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="7">
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <h3>No products found</h3>
+          <p>Try adjusting your search or filter.</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(p => {
+    const alert  = p.lowStockAlertAt || 3;
+    const qty    = p.stockQuantity || 0;
+    // progress bar: cap at 2× alert threshold as "full"
+    const max    = Math.max(alert * 2, qty, 1);
+    const pct    = Math.min(Math.round((qty / max) * 100), 100);
+
     let status, badgeClass, barColor;
-    if (item.stock === 0) { status = 'Out of Stock'; badgeClass = 'badge-red'; barColor = 'var(--red)'; }
-    else if (item.stock <= item.alert) { status = 'Low Stock'; badgeClass = 'badge-yellow'; barColor = 'var(--yellow)'; }
-    else { status = 'In Stock'; badgeClass = 'badge-green'; barColor = 'var(--green)'; }
+    if (qty === 0)        { status = 'Out of Stock'; badgeClass = 'badge-red';    barColor = 'var(--red)'; }
+    else if (qty <= alert){ status = 'Low Stock';    badgeClass = 'badge-yellow'; barColor = 'var(--yellow)'; }
+    else                  { status = 'In Stock';     badgeClass = 'badge-green';  barColor = 'var(--green)'; }
+
+    const imgStyle = p.uri && p.uri.startsWith('http')
+      ? `background-image:url('${p.uri}');background-size:cover;background-position:center;`
+      : '';
 
     return `
-    <tr>
-      <td><div class="product-cell"><div class="product-img">🌸</div><div class="product-name">${item.name}</div></div></td>
-      <td style="color:var(--text-muted);font-size:12px;">${item.sku}</td>
-      <td><strong style="${item.stock===0?'color:var(--red)':item.stock<=item.alert?'color:var(--yellow)':''}">${item.stock}</strong></td>
-      <td style="color:var(--text-muted);">${item.alert}</td>
-      <td style="min-width:120px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="progress-bar" style="flex:1;">
-            <div class="progress-fill" style="width:${pct}%;background:${barColor};"></div>
+      <tr>
+        <td>
+          <div class="product-cell">
+            <div class="product-img" style="${imgStyle}">${!p.uri || !p.uri.startsWith('http') ? '🌸' : ''}</div>
+            <div>
+              <div class="product-name">${esc(p.name)}</div>
+              <div class="product-sku">${p._id}</div>
+            </div>
           </div>
-          <span style="font-size:11px;color:var(--text-muted);width:28px;">${pct}%</span>
-        </div>
-      </td>
-      <td><span class="badge ${badgeClass}">${status}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="icon-btn" title="Restock" onclick="openModal('restockModal')">➕</button>
-          <button class="icon-btn" title="Edit alert" onclick="showToast('Alert threshold updated','info')">🔔</button>
-        </div>
-      </td>
-    </tr>`;
+        </td>
+        <td style="color:var(--text-muted);font-size:13px;">${p.category?.name || '—'}</td>
+        <td>
+          <strong style="${qty === 0 ? 'color:var(--red)' : qty <= alert ? 'color:var(--yellow)' : ''}">
+            ${qty}
+          </strong>
+        </td>
+        <td style="color:var(--text-muted);">${alert}</td>
+        <td style="min-width:120px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="progress-bar" style="flex:1;">
+              <div class="progress-fill" style="width:${pct}%;background:${barColor};"></div>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted);width:28px;">${pct}%</span>
+          </div>
+        </td>
+        <td><span class="badge ${badgeClass}">${status}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="icon-btn" title="Update stock" onclick="openRestockModal('${p._id}')">➕</button>
+          </div>
+        </td>
+      </tr>`;
   }).join('');
-});
+}
+
+/* ═══════════════════════════════════
+   RESTOCK MODAL
+═══════════════════════════════════ */
+function openRestockModal(productId) {
+  const p = products.find(x => x._id === productId);
+  if (!p) return;
+
+  document.getElementById('restock-id').value    = p._id;
+  document.getElementById('restock-name').value  = p.name;
+  document.getElementById('restock-qty').value   = p.stockQuantity || 0;
+  document.getElementById('restock-alert').value = p.lowStockAlertAt || 3;
+  hideErr('restock-error');
+  openModal('restockModal');
+}
+
+async function saveRestock() {
+  const productId    = document.getElementById('restock-id').value;
+  const stockQuantity  = document.getElementById('restock-qty').value;
+  const lowStockAlertAt = document.getElementById('restock-alert').value;
+
+  if (stockQuantity === '') { showErr('restock-error', 'Stock quantity is required.'); return; }
+  if (lowStockAlertAt === '') { showErr('restock-error', 'Alert threshold is required.'); return; }
+
+  const btn = document.getElementById('restock-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    await API.admin.editProduct({
+      productId,
+      stockQuantity: Number(stockQuantity),
+      lowStockAlertAt: Number(lowStockAlertAt),
+      // pass existing values so nothing else gets wiped
+      ...preserveProductFields(productId)
+    });
+
+    // update local state
+    const idx = products.findIndex(x => x._id === productId);
+    if (idx !== -1) {
+      products[idx].stockQuantity  = Number(stockQuantity);
+      products[idx].lowStockAlertAt = Number(lowStockAlertAt);
+    }
+
+    updateStats(); renderBanner(); renderTable();
+    closeModal('restockModal');
+    showToast('Stock updated! 📦', 'success');
+  } catch (err) {
+    showErr('restock-error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Update Stock';
+  }
+}
+
+// editProduct requires all fields — pull existing values from local state
+function preserveProductFields(productId) {
+  const p = products.find(x => x._id === productId);
+  if (!p) return {};
+  return {
+    name:         p.name,
+    description:  p.description,
+    originalPrice: p.price?.originalPrice,
+    sellingPrice:  p.price?.sellingPrice,
+    colors:       (p.colors || []).join(','),
+    material:     p.material,
+    careInstructions: p.careInstructions,
+    isFeatured:   p.isFeatured,
+    isHidden:     p.isHidden,
+    isDraft:      p.isDraft,
+    category:     p.category?._id || p.category || '',
+  };
+}
+
+/* ═══════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════ */
+function exportCSV() {
+  if (!products.length) { showToast('No products to export', 'error'); return; }
+
+  const headers = ['name', 'category', 'stockQuantity', 'lowStockAlertAt', 'status'];
+  const rows = products.map(p => [
+    p.name,
+    p.category?.name || '',
+    p.stockQuantity,
+    p.lowStockAlertAt,
+    stockStatus(p) === 'out' ? 'Out of Stock' : stockStatus(p) === 'low' ? 'Low Stock' : 'In Stock'
+  ]);
+
+  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'inventory.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('Report exported!', 'success');
+}
+
+/* ═══════════════════════════════════
+   TINY HELPERS
+═══════════════════════════════════ */
+function esc(str = '') {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideErr(id) {
+  const el = document.getElementById(id);
+  el.textContent = ''; el.style.display = 'none';
+}
 </script>
 </body>
 </html>

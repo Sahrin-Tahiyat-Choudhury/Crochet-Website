@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Discounts & Promos — The Yarn Journey Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="admin-layout">
@@ -14,151 +14,495 @@
     <div class="page-header">
       <div class="page-header-left">
         <h1>Discounts & Promos</h1>
-        <p>Manage coupons, sales, and promotions</p>
+        <p>Manage coupons and promotions</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-primary" onclick="openModal('addPromoModal')">＋ Create Promo</button>
+        <button class="btn btn-primary" onclick="openAddModal()">＋ Create Promo</button>
       </div>
     </div>
 
+    <!-- Stat Cards -->
     <div class="stat-cards">
       <div class="stat-card">
         <div class="stat-icon">✂️</div>
-        <div class="stat-info"><div class="stat-label">Active Promos</div><div class="stat-value">5</div><div class="stat-sub">Running now</div></div>
+        <div class="stat-info">
+          <div class="stat-label">Total Coupons</div>
+          <div class="stat-value" id="stat-total">—</div>
+        </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon">🎟️</div>
-        <div class="stat-info"><div class="stat-label">Coupons Used</div><div class="stat-value">38</div><div class="stat-sub">↑ 12 this week</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">💸</div>
-        <div class="stat-info"><div class="stat-label">Total Discounted</div><div class="stat-value">₹6.2k</div><div class="stat-sub neutral">This month</div></div>
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="stat-active">—</div>
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📅</div>
-        <div class="stat-info"><div class="stat-label">Expiring Soon</div><div class="stat-value">2</div><div class="stat-sub warn">Within 7 days</div></div>
+        <div class="stat-info">
+          <div class="stat-label">Expiring Soon</div>
+          <div class="stat-value" id="stat-expiring">—</div>
+          <div class="stat-sub warn">Within 7 days</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🚫</div>
+        <div class="stat-info">
+          <div class="stat-label">Expired</div>
+          <div class="stat-value" id="stat-expired">—</div>
+        </div>
       </div>
     </div>
 
+    <!-- Table -->
     <div class="card">
-      <div class="card-header"><span class="card-title">All Promotions</span></div>
+      <div class="card-header">
+        <span class="card-title">All Promotions</span>
+      </div>
       <div class="table-wrapper">
         <table>
           <thead>
             <tr>
-              <th>PROMO NAME</th>
               <th>CODE</th>
               <th>TYPE</th>
               <th>VALUE</th>
-              <th>USED</th>
+              <th>MIN ORDER</th>
               <th>EXPIRES</th>
               <th>STATUS</th>
               <th>ACTIONS</th>
             </tr>
           </thead>
-          <tbody id="promoTbody"></tbody>
+          <tbody id="promoTbody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
   </main>
 </div>
 
-<!-- Add Promo Modal -->
+<!-- ══════════════════════════════════
+     ADD COUPON MODAL
+══════════════════════════════════ -->
 <div class="modal-overlay" id="addPromoModal">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title">Create Promotion</span>
+      <span class="modal-title">Create Coupon</span>
       <button class="modal-close" onclick="closeModal('addPromoModal')">✕</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Promotion Name</label>
-        <input class="form-input" placeholder="e.g. Summer Sale 2026" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Coupon Code</label>
-        <input class="form-input" placeholder="e.g. SUMMER20" style="text-transform:uppercase;" />
+        <label class="form-label">Coupon Code <span style="color:var(--red)">*</span></label>
+        <input id="add-code" class="form-input" placeholder="e.g. SUMMER20" style="text-transform:uppercase;" />
+        <div class="form-hint">Customers enter this at checkout. Auto-uppercased.</div>
       </div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Discount Type</label>
-          <select class="form-select">
-            <option>Percentage (%)</option>
-            <option>Fixed Amount (₹)</option>
-            <option>Free Shipping</option>
+          <label class="form-label">Discount Type <span style="color:var(--red)">*</span></label>
+          <select id="add-type" class="form-select">
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount (₹)</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label">Discount Value</label>
-          <input class="form-input" type="number" placeholder="e.g. 15" />
+          <label class="form-label">Discount Value <span style="color:var(--red)">*</span></label>
+          <input id="add-value" class="form-input" type="number" min="0" placeholder="e.g. 20" />
         </div>
       </div>
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">Start Date</label>
-          <input class="form-input" type="date" />
+          <label class="form-label">Min. Order Amount (₹)</label>
+          <input id="add-minOrder" class="form-input" type="number" min="0" placeholder="0 = no minimum" />
         </div>
         <div class="form-group">
-          <label class="form-label">End Date</label>
-          <input class="form-input" type="date" />
+          <label class="form-label">Expiry Date <span style="color:var(--red)">*</span></label>
+          <input id="add-expiry" class="form-input" type="date" />
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Min. Order Amount (₹)</label>
-        <input class="form-input" type="number" placeholder="0 = no minimum" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Usage Limit</label>
-        <input class="form-input" type="number" placeholder="Leave blank for unlimited" />
-      </div>
       <div class="toggle-row">
-        <span style="font-size:13px;font-weight:500;">Active</span>
-        <button class="toggle on"></button>
+        <div>
+          <div style="font-size:13px;font-weight:500;">Active</div>
+          <div class="form-hint" style="margin-top:2px;">Inactive coupons can't be used at checkout.</div>
+        </div>
+        <button id="add-isActive" class="toggle on" onclick="this.classList.toggle('on')"></button>
       </div>
+      <p id="add-error" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"></p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('addPromoModal')">Cancel</button>
-      <button class="btn btn-primary" onclick="showToast('Promo created! ✂️','success');closeModal('addPromoModal')">Create Promo</button>
+      <button class="btn btn-primary" id="add-save-btn" onclick="saveCoupon()">Create Coupon</button>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════════
+     EDIT COUPON MODAL
+══════════════════════════════════ -->
+<div class="modal-overlay" id="editPromoModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Coupon</span>
+      <button class="modal-close" onclick="closeModal('editPromoModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="edit-id" type="hidden" />
+      <div class="form-group">
+        <label class="form-label">Coupon Code <span style="color:var(--red)">*</span></label>
+        <input id="edit-code" class="form-input" style="text-transform:uppercase;" />
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Discount Type <span style="color:var(--red)">*</span></label>
+          <select id="edit-type" class="form-select">
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount (₹)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Discount Value <span style="color:var(--red)">*</span></label>
+          <input id="edit-value" class="form-input" type="number" min="0" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Min. Order Amount (₹)</label>
+          <input id="edit-minOrder" class="form-input" type="number" min="0" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Expiry Date <span style="color:var(--red)">*</span></label>
+          <input id="edit-expiry" class="form-input" type="date" />
+        </div>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div style="font-size:13px;font-weight:500;">Active</div>
+          <div class="form-hint" style="margin-top:2px;">Inactive coupons can't be used at checkout.</div>
+        </div>
+        <button id="edit-isActive" class="toggle on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <p id="edit-error" style="color:var(--red);font-size:12px;margin-top:4px;display:none;"></p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editPromoModal')">Cancel</button>
+      <button class="btn btn-primary" id="edit-save-btn" onclick="updateCoupon()">Update Coupon</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     DELETE CONFIRM MODAL
+══════════════════════════════════ -->
+<div class="modal-overlay" id="deletePromoModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">Delete Coupon?</span>
+      <button class="modal-close" onclick="closeModal('deletePromoModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--text-mid);line-height:1.6;">
+        You're about to delete coupon <strong id="delete-coupon-code"></strong>.
+        Customers will no longer be able to use this code.
+      </p>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('deletePromoModal')">Cancel</button>
+      <button class="btn btn-danger" id="delete-confirm-btn" onclick="executeDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="../api.js"></script>
 <script src="shared.js"></script>
 <script>
-const PROMOS = [
-  { name:'Mother\'s Day Sale',   code:'MOM20',    type:'Percentage', value:'20%',    used:14, expires:'31 May 2026', status:'Active' },
-  { name:'Welcome Discount',     code:'WELCOME10', type:'Percentage', value:'10%',    used:8,  expires:'30 Jun 2026', status:'Active' },
-  { name:'Bulk Order Deal',      code:'BULK15',    type:'Percentage', value:'15%',    used:5,  expires:'15 Jun 2026', status:'Active' },
-  { name:'Free Shipping Day',    code:'FREESHIP',  type:'Free Ship',  value:'₹0',     used:6,  expires:'29 May 2026', status:'Expiring' },
-  { name:'Festive Flat Off',     code:'FEST100',   type:'Fixed',      value:'₹100',   used:5,  expires:'30 May 2026', status:'Expiring' },
-  { name:'Valentine\'s 2026',    code:'LOVE25',    type:'Percentage', value:'25%',    used:22, expires:'14 Feb 2026', status:'Expired' },
-];
+/* ═══════════════════════════════════
+   STATE
+═══════════════════════════════════ */
+let coupons = [];
+let pendingDeleteId = null;
 
+/* ═══════════════════════════════════
+   BOOT
+═══════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
   renderSidebar('discounts');
-  initToggles();
-
-  const tbody = document.getElementById('promoTbody');
-  tbody.innerHTML = PROMOS.map(p => {
-    const sb = p.status === 'Active' ? 'badge-green' : p.status === 'Expiring' ? 'badge-yellow' : 'badge-gray';
-    return `
-    <tr>
-      <td><span style="font-weight:500;">${p.name}</span></td>
-      <td><code style="background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">${p.code}</code></td>
-      <td><span style="color:var(--text-mid);font-size:13px;">${p.type}</span></td>
-      <td><strong>${p.value}</strong></td>
-      <td><span>${p.used}</span></td>
-      <td><span style="font-size:12px;color:${p.status==='Expiring'?'var(--yellow)':'var(--text-muted)'};">${p.expires}</span></td>
-      <td><span class="badge ${sb}">${p.status}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="icon-btn" onclick="showToast('Editing promo','info')">✏️</button>
-          <button class="icon-btn danger" onclick="showToast('Promo deleted','error')">🗑️</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
+  fetchCoupons();
 });
+
+/* ═══════════════════════════════════
+   FETCH  —  GET /admin/coupons
+═══════════════════════════════════ */
+async function fetchCoupons() {
+  try {
+    const data = await API.admin.getCoupons();
+    // backend returns array directly (res.json(coupons))
+    coupons = Array.isArray(data) ? data : (data.coupons || []);
+    updateStats();
+    renderTable();
+  } catch (err) {
+    showToast('Failed to load coupons: ' + err.message, 'error');
+    document.getElementById('promoTbody').innerHTML =
+      `<tr><td colspan="7" class="empty-state">Failed to load. Check console.</td></tr>`;
+  }
+}
+
+/* ═══════════════════════════════════
+   STATS
+═══════════════════════════════════ */
+function updateStats() {
+  const now = new Date();
+  const in7 = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const active   = coupons.filter(c => c.isActive && new Date(c.expiryDate) > now).length;
+  const expiring = coupons.filter(c => {
+    const exp = new Date(c.expiryDate);
+    return c.isActive && exp > now && exp <= in7;
+  }).length;
+  const expired  = coupons.filter(c => new Date(c.expiryDate) <= now).length;
+
+  document.getElementById('stat-total').textContent    = coupons.length;
+  document.getElementById('stat-active').textContent   = active;
+  document.getElementById('stat-expiring').textContent = expiring;
+  document.getElementById('stat-expired').textContent  = expired;
+}
+
+/* ═══════════════════════════════════
+   TABLE
+═══════════════════════════════════ */
+function renderTable() {
+  const tbody = document.getElementById('promoTbody');
+
+  if (!coupons.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="7">
+        <div class="empty-state">
+          <div class="empty-icon">✂️</div>
+          <h3>No coupons yet</h3>
+          <p>Click <strong>+ Create Promo</strong> to add your first coupon.</p>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  const now = new Date();
+
+  tbody.innerHTML = coupons.map(c => {
+    const expDate = new Date(c.expiryDate);
+    const in7     = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const isExpired  = expDate <= now;
+    const isExpiring = !isExpired && expDate <= in7 && c.isActive;
+
+    let statusLabel, statusClass;
+    if (!c.isActive)       { statusLabel = 'Inactive';  statusClass = 'badge-gray'; }
+    else if (isExpired)    { statusLabel = 'Expired';   statusClass = 'badge-red'; }
+    else if (isExpiring)   { statusLabel = 'Expiring';  statusClass = 'badge-yellow'; }
+    else                   { statusLabel = 'Active';    statusClass = 'badge-green'; }
+
+    const typeLabel = c.discountType === 'percentage' ? 'Percentage' : 'Fixed';
+    const valueDisplay = c.discountType === 'percentage' ? `${c.value}%` : `₹${c.value}`;
+    const minDisplay = c.minOrderAmount > 0 ? `₹${c.minOrderAmount}` : '—';
+    const expiryDisplay = expDate.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+
+    return `
+      <tr>
+        <td>
+          <code style="background:var(--accent-soft);color:var(--accent);padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;">
+            ${esc(c.code)}
+          </code>
+        </td>
+        <td><span style="color:var(--text-mid);font-size:13px;">${typeLabel}</span></td>
+        <td><strong>${valueDisplay}</strong></td>
+        <td><span style="font-size:13px;">${minDisplay}</span></td>
+        <td>
+          <span style="font-size:12px;color:${isExpiring ? 'var(--yellow)' : isExpired ? 'var(--red)' : 'var(--text-muted)'};">
+            ${expiryDisplay}
+          </span>
+        </td>
+        <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="icon-btn" title="Edit" onclick="openEditModal('${c._id}')">✏️</button>
+            <button class="icon-btn danger" title="Delete" onclick="openDeleteModal('${c._id}', '${esc(c.code)}')">🗑️</button>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════
+   ADD  —  POST /admin/coupons
+═══════════════════════════════════ */
+function openAddModal() {
+  document.getElementById('add-code').value     = '';
+  document.getElementById('add-type').value     = 'percentage';
+  document.getElementById('add-value').value    = '';
+  document.getElementById('add-minOrder').value = '';
+  document.getElementById('add-expiry').value   = '';
+  document.getElementById('add-isActive').classList.add('on');
+  hideErr('add-error');
+  openModal('addPromoModal');
+}
+
+async function saveCoupon() {
+  const code     = document.getElementById('add-code').value.trim().toUpperCase();
+  const type     = document.getElementById('add-type').value;
+  const value    = document.getElementById('add-value').value;
+  const minOrder = document.getElementById('add-minOrder').value;
+  const expiry   = document.getElementById('add-expiry').value;   // yyyy-mm-dd from input[type=date]
+  const isActive = document.getElementById('add-isActive').classList.contains('on');
+
+  if (!code)   { showErr('add-error', 'Coupon code is required.'); return; }
+  if (!value)  { showErr('add-error', 'Discount value is required.'); return; }
+  if (!expiry) { showErr('add-error', 'Expiry date is required.'); return; }
+
+  // backend expects DD-MM-YYYY
+  const expiryFormatted = formatDateForAPI(expiry);
+
+  const btn = document.getElementById('add-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    const data = await API.admin.createCoupon({
+      code,
+      discountType: type,
+      value: Number(value),
+      minOrderAmount: minOrder ? Number(minOrder) : 0,
+      expiryDate: expiryFormatted,
+      isActive
+    });
+
+    coupons.push(data.coupon);
+    updateStats(); renderTable();
+    closeModal('addPromoModal');
+    showToast(`Coupon "${code}" created! ✂️`, 'success');
+  } catch (err) {
+    showErr('add-error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Create Coupon';
+  }
+}
+
+/* ═══════════════════════════════════
+   EDIT  —  PATCH /admin/coupons/:id
+═══════════════════════════════════ */
+function openEditModal(couponId) {
+  const c = coupons.find(x => x._id === couponId);
+  if (!c) return;
+
+  document.getElementById('edit-id').value      = c._id;
+  document.getElementById('edit-code').value    = c.code;
+  document.getElementById('edit-type').value    = c.discountType;
+  document.getElementById('edit-value').value   = c.value;
+  document.getElementById('edit-minOrder').value = c.minOrderAmount || 0;
+  // convert stored ISO date → yyyy-mm-dd for input[type=date]
+  document.getElementById('edit-expiry').value  = isoToInputDate(c.expiryDate);
+  document.getElementById('edit-isActive').classList.toggle('on', !!c.isActive);
+  hideErr('edit-error');
+  openModal('editPromoModal');
+}
+
+async function updateCoupon() {
+  const id       = document.getElementById('edit-id').value;
+  const code     = document.getElementById('edit-code').value.trim().toUpperCase();
+  const type     = document.getElementById('edit-type').value;
+  const value    = document.getElementById('edit-value').value;
+  const minOrder = document.getElementById('edit-minOrder').value;
+  const expiry   = document.getElementById('edit-expiry').value;
+  const isActive = document.getElementById('edit-isActive').classList.contains('on');
+
+  if (!code)   { showErr('edit-error', 'Coupon code is required.'); return; }
+  if (!value)  { showErr('edit-error', 'Discount value is required.'); return; }
+  if (!expiry) { showErr('edit-error', 'Expiry date is required.'); return; }
+
+  const btn = document.getElementById('edit-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    const data = await API.admin.updateCoupon(id, {
+      code,
+      discountType: type,
+      value: Number(value),
+      minOrderAmount: minOrder ? Number(minOrder) : 0,
+      expiryDate: formatDateForAPI(expiry),
+      isActive
+    });
+
+    const idx = coupons.findIndex(x => x._id === id);
+    if (idx !== -1) coupons[idx] = { ...coupons[idx], ...data };
+    updateStats(); renderTable();
+    closeModal('editPromoModal');
+    showToast(`Coupon "${code}" updated!`, 'success');
+  } catch (err) {
+    showErr('edit-error', err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Update Coupon';
+  }
+}
+
+/* ═══════════════════════════════════
+   DELETE  —  DELETE /admin/coupons/:id
+═══════════════════════════════════ */
+function openDeleteModal(couponId, code) {
+  pendingDeleteId = couponId;
+  document.getElementById('delete-coupon-code').textContent = code;
+  openModal('deletePromoModal');
+}
+
+async function executeDelete() {
+  if (!pendingDeleteId) return;
+  const id = pendingDeleteId;
+
+  const btn = document.getElementById('delete-confirm-btn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+
+  try {
+    await API.admin.deleteCoupon(id);
+    coupons = coupons.filter(c => c._id !== id);
+    updateStats(); renderTable();
+    closeModal('deletePromoModal');
+    showToast('Coupon deleted.', 'error');
+  } catch (err) {
+    showToast('Delete failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Yes, Delete';
+    pendingDeleteId = null;
+  }
+}
+
+/* ═══════════════════════════════════
+   DATE HELPERS
+   backend wants DD-MM-YYYY
+   input[type=date] gives YYYY-MM-DD
+═══════════════════════════════════ */
+function formatDateForAPI(yyyymmdd) {
+  const [y, m, d] = yyyymmdd.split('-');
+  return `${d}-${m}-${y}`;
+}
+function isoToInputDate(iso) {
+  // iso can be "2026-05-31T00:00:00.000Z" or a Date string
+  const d = new Date(iso);
+  const yyyy = d.getFullYear();
+  const mm   = String(d.getMonth() + 1).padStart(2, '0');
+  const dd   = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+/* ═══════════════════════════════════
+   TINY HELPERS
+═══════════════════════════════════ */
+function esc(str = '') {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideErr(id) {
+  const el = document.getElementById(id);
+  el.textContent = ''; el.style.display = 'none';
+}
 </script>
 </body>
 </html>
