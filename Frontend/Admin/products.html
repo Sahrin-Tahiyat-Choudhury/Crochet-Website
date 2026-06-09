@@ -404,14 +404,7 @@ async function publishProduct() {
     const catVal = document.getElementById('productCategory').value;
     if (catVal) formData.append('category', catVal);
 
-    const response = await fetch('http://127.0.0.1:3000/api/product/upload', {
-      method: 'POST',
-      credentials: 'include',
-      body: formData
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to create product');
+    const response = await API.admin.createProduct(formData);
 
     showToast('Product created successfully 🌸', 'success');
     closeModal('addProductModal');
@@ -441,14 +434,7 @@ async function saveDraftProduct() {
     const imgFile = document.getElementById('productImage').files[0];
     if (imgFile) formData.append('image', imgFile);
 
-    const response = await fetch('http://127.0.0.1:3000/api/product/upload', {
-      method: 'POST',
-      credentials: 'include',
-      body: formData
-    });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Failed to save draft');
+    const response = await API.admin.createProduct(formData);
 
     showToast('Draft saved successfully', 'success');
     closeModal('addProductModal');
