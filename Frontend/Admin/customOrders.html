@@ -90,15 +90,10 @@
   </div>
 
   <script>
-    const API_BASE = "http://127.0.0.1:3000/api";
 
     async function fetchOrders() {
       try {
-        const res = await fetch(`${API_BASE}/customOrder/custom-orders`, {
-          credentials: "include"
-        });
-
-        const data = await res.json();
+        const data = await await API.customOrder.list();
         const orders = data.orders || [];
 
         const container = document.getElementById("orders-container");
