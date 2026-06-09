@@ -93,6 +93,11 @@ const API = (() => {
             patch(`/auth/upload-photo`, data)
 
         },
+        auth: {
+            register: (data) => post('/auth/register',data),
+            login: (data) => post('/auth/login',data),
+            logout: () => get('/auth/logout'),
+        }
         customers: {
             getAll: () => get(`/customer`),
             getById: (id) => get(`/customers/${id}`),
