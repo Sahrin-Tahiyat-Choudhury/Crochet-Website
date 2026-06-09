@@ -21,7 +21,20 @@ const settingsRoutes = require('./routes/settings.routes');
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:5500','https://819f7ddd.crochet-website.pages.dev/'], // adjust to your frontend ports
+  origin: function(origin, callback) {
+    const allowed = [
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+    ];
+    // Allow any Cloudflare Pages preview or production URL
+    if (!origin || allowed.includes(origin) || 
+        origin.endsWith('.crochet-website.pages.dev') ||
+        origin === 'https://crochet-website.pages.dev') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
