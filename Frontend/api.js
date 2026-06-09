@@ -2,7 +2,7 @@ const API = (() => {
     const BASE = window.location.hostname === 'localhost' || 
              window.location.hostname === '127.0.0.1'
   ? 'http://127.0.0.1:3000/api'
-  : 'https://crochet-website-7n9s.onrender.com/';
+  : 'https://crochet-website-7n9s.onrender.com/api';
 
     async function request(method, path, body = null, isFormData = false) {
         const options = {
