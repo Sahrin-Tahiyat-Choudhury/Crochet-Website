@@ -21,7 +21,7 @@ const settingsRoutes = require('./routes/settings.routes');
 
 const app = express();
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:5500'], // adjust to your frontend ports
+  origin: ['http://localhost:3000', 'http://127.0.0.1:5500','https://819f7ddd.crochet-website.pages.dev/'], // adjust to your frontend ports
   credentials: true
 }));
 
