@@ -34,11 +34,10 @@ async function registerUser(req, res) {
     }, process.env.JWT_SECRET)
 
     res.cookie("token", token, {
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production'
-    })
-
+  httpOnly: true,
+  sameSite: 'none',   // ✅ Required for cross-origin
+  secure: true        // ✅ Required when sameSite is 'none'
+});
     res.status(201).json({
         message: "User registered successfully",
         user: {
