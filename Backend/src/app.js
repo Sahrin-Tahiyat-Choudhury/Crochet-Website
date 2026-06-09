@@ -25,6 +25,7 @@ app.use(cors({
     const allowed = [
       'http://localhost:5500',
       'http://127.0.0.1:5500',
+      'https://crochet-website.pages.dev'
     ];
     // Allow any Cloudflare Pages preview or production URL
     if (!origin || allowed.includes(origin) || 
