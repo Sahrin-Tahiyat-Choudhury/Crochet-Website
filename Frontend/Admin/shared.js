@@ -6,7 +6,7 @@ const API_BASE = window.location.hostname === 'localhost' ||
                  window.location.hostname === '127.0.0.1'
   ? 'http://127.0.0.1:3000/api'
   : 'https://crochet-website-7n9s.onrender.com/api';
-
+const ADMIN_API_BASE = API_BASE; // ← added this new line
 
 let adminCurrentUser = null;
 
