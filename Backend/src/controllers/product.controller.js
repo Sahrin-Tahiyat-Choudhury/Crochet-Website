@@ -135,7 +135,7 @@ async function getAllCategories(req, res) {
     const categories = await categoryModel
     .find()
     .select("name admin products isHidden order")
-    .populate("admin","username email")
+    .populate("admin","username")
     .populate("products", "_id")
     .sort({ order: 1 });
 
@@ -148,7 +148,7 @@ async function getAllCategories(req, res) {
 async function getCategoryById(req, res) {
     const categoryId = req.params.categoryId;
 
-    const category = await categoryModel.findById(categoryId).populate("admin","username email").populate("products");
+    const category = await categoryModel.findById(categoryId).populate("admin","username").populate("products");
 
     return res.status(200).json({
         message: "Category fetched successfully",
