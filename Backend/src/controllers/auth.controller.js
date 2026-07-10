@@ -35,8 +35,8 @@ async function registerUser(req, res) {
 
     res.cookie("token", token, {
   httpOnly: true,
-  sameSite: 'none',   // ✅ Required for cross-origin
-  secure: true        // ✅ Required when sameSite is 'none'
+  sameSite: 'none',   // Required for cross-origin
+  secure: true        // Required when sameSite is 'none'
 });
     res.status(201).json({
         message: "User registered successfully",
@@ -51,6 +51,15 @@ async function registerUser(req, res) {
 
 async function loginUser(req, res) {
     const { username,email, password } = req.body;
+
+    if (
+        (username !== undefined && typeof username !== 'string') ||
+        (email !== undefined && typeof email !== 'string') ||
+        typeof password !== 'string' ||
+        (!username && !email)
+    ) {
+        return res.status(400).json({ message: "Invalid credentials format" });
+    }
 
     const user = await userModel.findOne({
         $or: [
@@ -77,7 +86,7 @@ async function loginUser(req, res) {
     res.cookie("token", token, {
         httpOnly: true,
         sameSite: 'strict',
-        secure: process.env.NODE_ENV === 'production'
+        secure: true
     });
 
     res.status(200).json({

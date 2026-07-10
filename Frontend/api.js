@@ -97,7 +97,7 @@ const API = (() => {
             register: (data) => post('/auth/register',data),
             login: (data) => post('/auth/login',data),
             logout: () => get('/auth/logout'),
-        }
+        },
         customers: {
             getAll: () => get(`/customer`),
             getById: (id) => get(`/customers/${id}`),
